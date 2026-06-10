@@ -17,6 +17,23 @@
           }
         }
       }
+    },
+    "NSLocalNetworkUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LibraScan uses the local network to find your Mac and type scanned codes on it. Data never leaves your network."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LibraScan 使用本地网络查找你的 Mac 并将扫码内容键入到 Mac，数据不会离开本地网络。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

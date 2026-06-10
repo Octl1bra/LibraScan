@@ -13,8 +13,10 @@ struct ScanView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var scanner = ScannerController()
+    @StateObject private var bridge = BridgeClient()
     @GestureState private var pinchAnchor: CGFloat?
     @State private var bannerDismissTask: Task<Void, Never>?
+    @State private var isBridgeSheetPresented = false
 
     private let bannerDuration: Duration = .seconds(4)
 
@@ -56,8 +58,10 @@ struct ScanView: View {
                 if isActive {
                     scanner.start()
                 }
+                bridge.sceneDidBecomeActive()
             case .background:
                 scanner.stop()
+                bridge.sceneDidEnterBackground()
             default:
                 break
             }
@@ -65,8 +69,14 @@ struct ScanView: View {
         .onChange(of: scanner.latestScan) { _, payload in
             guard let payload else { return }
             HapticFeedback.success()
-            modelContext.insert(ScanRecord(content: payload.content, symbology: payload.symbology))
+            let record = ScanRecord(content: payload.content, symbology: payload.symbology)
+            modelContext.insert(record)
+            // History is the source of truth; the Mac bridge is a side channel.
+            bridge.send(payload, scannedAt: record.scannedAt)
             scheduleBannerDismiss(for: payload)
+        }
+        .sheet(isPresented: $isBridgeSheetPresented) {
+            BridgeSheet(bridge: bridge)
         }
     }
 
@@ -105,9 +115,14 @@ struct ScanView: View {
             }
             .padding(.bottom, 32)
 
-            VStack {
+            VStack(spacing: 12) {
+                HStack {
+                    Spacer()
+                    bridgeButton
+                }
+                .padding(.trailing, 16)
                 if let payload = scanner.latestScan {
-                    ScanResultBanner(payload: payload)
+                    ScanResultBanner(payload: payload, delivery: bridge.deliveries[payload.id])
                         .id(payload.id)
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
@@ -140,6 +155,20 @@ struct ScanView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(.black.opacity(0.4), in: Capsule())
+    }
+
+    private var bridgeButton: some View {
+        Button {
+            isBridgeSheetPresented = true
+        } label: {
+            Image(systemName: "keyboard.badge.ellipsis")
+                .font(.title3)
+                .foregroundStyle(bridge.isConnected ? Color.accentColor : .white)
+                .padding(12)
+                .background(.ultraThinMaterial, in: Circle())
+        }
+        .accessibilityLabel(Text("Type to Mac"))
+        .accessibilityValue(bridge.isConnected ? Text("Connected") : Text("Not connected"))
     }
 
     private var torchButton: some View {

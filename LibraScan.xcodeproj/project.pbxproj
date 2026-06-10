@@ -10,9 +10,22 @@
 		86B181562FD9846A001037CC /* LibraScan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LibraScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		86B181662FD9846B001037CC /* Exceptions for "LibraScan" folder in "LibraScan" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 86B181552FD9846A001037CC /* LibraScan */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		86B181582FD9846A001037CC /* LibraScan */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				86B181662FD9846B001037CC /* Exceptions for "LibraScan" folder in "LibraScan" target */,
+			);
 			path = LibraScan;
 			sourceTree = "<group>";
 		};
@@ -257,6 +270,7 @@
 				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LibraScan/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "LibraScan uses the camera to scan QR codes and barcodes. The camera feed is never saved or uploaded.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -289,6 +303,7 @@
 				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LibraScan/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "LibraScan uses the camera to scan QR codes and barcodes. The camera feed is never saved or uploaded.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

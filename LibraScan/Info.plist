@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_librascan-key._tcp</string>
+		<string>_librascan-key._udp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>LibraScan uses the local network to find your Mac and type scanned codes on it. Data never leaves your network.</string>
+</dict>
+</plist>

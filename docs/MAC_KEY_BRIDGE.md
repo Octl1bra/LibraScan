@@ -6,7 +6,7 @@
 | 形态 | iOS 端扩展 + macOS 菜单栏 App |
 | 传输 | MultipeerConnectivity（局域网点对点，免服务器） |
 | 文档日期 | 2026-06-10 |
-| 状态 | Mac 端已实现（独立仓库 [ScanKeyboard](https://github.com/Octl1bra/ScanKeyboard)）；iOS 端 `BridgeClient` 待接入 LibraScan |
+| 状态 | 双端已实现：Mac 端见独立仓库 [ScanKeyboard](https://github.com/Octl1bra/ScanKeyboard)；iOS 端 `BridgeClient` 已接入 LibraScan |
 
 ## 1. 概述与场景
 
@@ -239,8 +239,28 @@ session 身份过滤回调、拒绝并断开孤儿会话）、CGEvent Unicode �
 按连接重置的 seq 去重（重复回执回显原结果）、30s 心跳 + 2 次丢失断开、协议版本门控、
 辅助功能引导。
 
-**待办（iOS 端）**：在 LibraScan 中加 `BridgeClient`（browse/invite/发送/待发队列/重连）、
-扫一扫页「键入到 Mac」入口、横幅回执角标——见第 7 节。
+**iOS 端（LibraScan，本仓库）已实现**：`Bridge/BridgeClient`（browse / 邀请加密会话 /
+30s 心跳 + 2 次丢失断开 / 待发队列 50 条溢出丢最旧 / 重连后按序补发可关 / seq 单调递增 /
+ack 驱动横幅角标 / 回前台自动重连上次 Mac、退后台断开）、扫一扫页右上角「键入到 Mac」入口
+（连接 sheet：附近 Mac 列表、连接状态、断开、补发开关）、横幅回执角标（待发送 / 发送中 /
+已键入 ✓ / 未授权 · 已暂停 · 失败 ⚠）、`Info.plist` 本地网络权限与 Bonjour 服务声明；
+协议层 `Bridge/BridgeMessage.swift` 与 Mac 端同构，需保持同步。
+
+**实现注记（对 §8 的从严处理）**：已发送但断线前未收到 ack 的条目**不补发**、直接标记失败——
+Mac 端 seq 去重按连接重置，跨连接补发可能造成二次键入；内容本身已在本地记录，不丢数据。
+待发队列只收断线期间新扫的码（与 §4.4 一致）。
+
+**实现注记（评审驱动的偏差）**：
+
+- **设备名**：无 user-assigned-device-name 权限时 `UIDevice.current.name` 在真机上只返回
+  通用「iPhone」，而 Mac 端信任列表以设备名为键——通用名会让所有 iPhone 在 Mac 上互认
+  （信任一台等于信任全部）。iOS 端检测到通用名时追加每安装持久化的 4 位后缀
+  （如「iPhone (3F8A)」）。§4.2 的配对码摘要未实现（邀请 context 为空，Mac 端本就忽略）。
+- **邀请失败 ≠ 掉线**：邀请被拒 / 超时视为「配对失败」而非「连接中断」——清除桥接意图、
+  清空待发队列、不自动重邀（自动重邀会反复弹出 Mac 确认框）；自动重连仅用于
+  曾建立连接后的掉线（退后台、Mac 休眠、心跳丢失）。
+- **本地网络权限**：实现 `didNotStartBrowsingForPeers` 回调，搜索失败时连接面板给出
+  「打开设置」入口；列表为空时 footer 提示检查本地网络权限。
 
 **Backlog（Mac 端，后续里程碑，对抗评审标为可接受的缺口）**：
 - 键入前系统通知预告 + 手动确认模式（§6.2 安全层之二、之三）

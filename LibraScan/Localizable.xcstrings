@@ -31,6 +31,16 @@
         }
       }
     },
+    "Can't search for nearby Macs" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法搜索附近的 Mac"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "zh-Hans" : {
@@ -71,6 +81,26 @@
         }
       }
     },
+    "Connected" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已连接"
+          }
+        }
+      }
+    },
+    "Connecting… Accept the request on the Mac if it asks." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接中…如 Mac 弹出请求，请点击允许。"
+          }
+        }
+      }
+    },
     "Copied" : {
       "localizations" : {
         "zh-Hans" : {
@@ -91,12 +121,42 @@
         }
       }
     },
+    "Couldn't connect. Check that the Mac allowed the connection." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未能连接，请确认 Mac 端已允许连接。"
+          }
+        }
+      }
+    },
     "Details" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "详情"
+          }
+        }
+      }
+    },
+    "Disconnect" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断开连接"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
           }
         }
       }
@@ -111,12 +171,32 @@
         }
       }
     },
+    "Failed to type on Mac" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "键入 Mac 失败"
+          }
+        }
+      }
+    },
     "History" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "记录"
+          }
+        }
+      }
+    },
+    "If no Macs appear, check that LibraScan is allowed to use the Local Network in Settings." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果找不到 Mac，请在「设置」中确认已允许 LibraScan 使用本地网络。"
           }
         }
       }
@@ -131,12 +211,62 @@
         }
       }
     },
+    "Looking for nearby Macs…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在查找附近的 Mac…"
+          }
+        }
+      }
+    },
+    "Mac not authorized to type" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac 未授权键入"
+          }
+        }
+      }
+    },
+    "Make sure Wi-Fi and Bluetooth are on for both devices, and LibraScan Key is running on the Mac." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请确保两台设备都已开启 Wi-Fi 与蓝牙，且 Mac 上正在运行 LibraScan Key。"
+          }
+        }
+      }
+    },
+    "Nearby Macs" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附近的 Mac"
+          }
+        }
+      }
+    },
     "No Scans Yet" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "还没有扫码记录"
+          }
+        }
+      }
+    },
+    "Not connected" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未连接"
           }
         }
       }
@@ -161,12 +291,32 @@
         }
       }
     },
+    "Queued to send" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待发送"
+          }
+        }
+      }
+    },
     "Requesting camera access…" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在请求相机权限…"
+          }
+        }
+      }
+    },
+    "Resend queued scans after reconnecting" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重连后补发排队的扫码"
           }
         }
       }
@@ -201,12 +351,32 @@
         }
       }
     },
+    "Scanned codes are typed into whatever text field has focus on the Mac." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扫到的码会键入到 Mac 当前聚焦的输入框。"
+          }
+        }
+      }
+    },
     "Search records" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "搜索记录"
+          }
+        }
+      }
+    },
+    "Sending to Mac…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在发送到 Mac…"
           }
         }
       }
@@ -257,6 +427,56 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开手电筒"
+          }
+        }
+      }
+    },
+    "Type to Mac" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "键入到 Mac"
+          }
+        }
+      }
+    },
+    "Typed on Mac" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已键入 Mac"
+          }
+        }
+      }
+    },
+    "Typing paused on Mac" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac 已暂停键入"
+          }
+        }
+      }
+    },
+    "Waiting to send to Mac" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待发送到 Mac"
+          }
+        }
+      }
+    },
+    "Will automatically reconnect to “%@”." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发现“%@”后将自动重连。"
           }
         }
       }
