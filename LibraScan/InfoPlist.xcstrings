@@ -1,0 +1,23 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSCameraUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LibraScan uses the camera to scan QR codes and barcodes. The camera feed is never saved or uploaded."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LibraScan 需要使用相机来扫描二维码和条形码，画面不会被保存或上传。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
