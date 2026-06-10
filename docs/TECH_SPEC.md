@@ -133,7 +133,7 @@ final class ScannerController: NSObject, ObservableObject,
 
 - `startRunning()` / `stopRunning()` 必须在专用串行队列执行，避免阻塞主线程（性能指标：冷启动 ≤ 1.5s）。
 - **去重（F1.6）**：按内容维护滑动窗口字典 `[String: Date]`——每次看到某内容就刷新其时间戳，
-  距上次看到 < 2s 则不触发；码持续在画面中时窗口一直滑动，只有离开视野满 2s 后才会再次触发。
+  距上次看到 < 0.5s 则不触发；码持续在画面中时窗口一直滑动，只有离开视野满 0.5s 后才会再次触发。
   按内容分键（而非单一 last-content 槽位）是为了多个码同框交替识别时互不打断窗口，
   避免横幅闪烁与记录刷屏；字典超 64 项时清理过期项。
 - **会话生命周期（F1.9）**：以 `selectedTab` 变化驱动 `start()/stop()`；同时监听 `scenePhase`，
@@ -155,7 +155,7 @@ final class ScannerController: NSObject, ObservableObject,
 AVCaptureMetadataOutput delegate
         │  (sessionQueue)
         ▼
- 去重检查（2s 窗口）
+ 去重检查（0.5s 窗口）
         │ 通过
         ▼
  MainActor: latestScan 更新

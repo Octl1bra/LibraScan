@@ -56,10 +56,9 @@ struct HistoryView: View {
                     }
                 }
             }
-            .confirmationDialog(
+            .alert(
                 "Clear all scan records?",
-                isPresented: $isClearConfirmationPresented,
-                titleVisibility: .visible
+                isPresented: $isClearConfirmationPresented
             ) {
                 Button("Clear All", role: .destructive) {
                     clearAll()

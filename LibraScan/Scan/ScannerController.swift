@@ -44,7 +44,7 @@ final class ScannerController: NSObject, ObservableObject {
     /// slot) so two codes alternating in frame don't break each other's window and
     /// spam the banner and history.
     private var recentScans: [String: Date] = [:]
-    private let dedupWindow: TimeInterval = 2
+    private let dedupWindow: TimeInterval = 0.5
 
     private nonisolated(unsafe) var observers: [NSObjectProtocol] = []
 
