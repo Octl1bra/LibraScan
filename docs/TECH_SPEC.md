@@ -95,8 +95,9 @@ LibraScan/
 │   ├── ScannerPreview.swift      // UIViewRepresentable 桥接预览层
 │   └── ScanResultBanner.swift    // 顶部结果横幅（非阻塞，含 SymbologyTag）
 ├── History/
-│   ├── HistoryView.swift         // 记录列表：@Query 倒序、搜索、左滑删除、清空
-│   └── HistoryDetailView.swift   // 记录详情：完整内容 + 操作按钮
+│   ├── HistoryView.swift         // 记录列表：@Query 倒序、搜索、左滑删除、清空、导出
+│   ├── HistoryDetailView.swift   // 记录详情：完整内容 + 操作按钮
+│   └── RecordsExport.swift       // 导出 txt（Transferable + FileRepresentation，分享时惰性生成）
 ├── Models/
 │   └── ScanRecord.swift
 ├── Shared/

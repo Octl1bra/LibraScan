@@ -101,6 +101,16 @@
         }
       }
     },
+    "Export Records" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出记录"
+          }
+        }
+      }
+    },
     "History" : {
       "localizations" : {
         "zh-Hans" : {
@@ -167,6 +177,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "扫一扫"
+          }
+        }
+      }
+    },
+    "Scan Records" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扫码记录"
           }
         }
       }

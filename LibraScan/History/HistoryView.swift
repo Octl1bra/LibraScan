@@ -49,6 +49,16 @@ struct HistoryView: View {
             .navigationTitle("History")
             .toolbar {
                 if !records.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        ShareLink(
+                            item: RecordsExport(rows: records.map {
+                                .init(content: $0.content, symbology: $0.symbology, scannedAt: $0.scannedAt)
+                            }),
+                            preview: SharePreview("Scan Records")
+                        ) {
+                            Label("Export Records", systemImage: "square.and.arrow.up")
+                        }
+                    }
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Clear All", systemImage: "trash", role: .destructive) {
                             isClearConfirmationPresented = true
