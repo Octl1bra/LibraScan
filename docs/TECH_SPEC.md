@@ -25,7 +25,7 @@
 │  RootTabView                                 │
 │   ├── ScanView          （Tab 1 扫一扫）      │
 │   │    ├── ScannerPreview（相机预览,UIKit桥接）│
-│   │    └── ScanResultSheet（结果卡片）         │
+│   │    └── ScanResultBanner（结果横幅）        │
 │   └── HistoryView       （Tab 2 记录）        │
 │        └── HistoryDetailView（记录详情）       │
 ├─────────────────────────────────────────────┤
@@ -93,7 +93,7 @@ LibraScan/
 │   ├── ScanView.swift            // 扫码页：预览 + 扫描框 + 手电筒 + 权限引导
 │   ├── ScannerController.swift   // AVCaptureSession 封装（ObservableObject）
 │   ├── ScannerPreview.swift      // UIViewRepresentable 桥接预览层
-│   └── ScanResultSheet.swift     // 识别结果卡片（.sheet + presentationDetents）
+│   └── ScanResultBanner.swift    // 顶部结果横幅（非阻塞，含 SymbologyTag）
 ├── History/
 │   ├── HistoryView.swift         // 记录列表：@Query 倒序、搜索、左滑删除、清空
 │   └── HistoryDetailView.swift   // 记录详情：完整内容 + 操作按钮
@@ -132,9 +132,10 @@ final class ScannerController: NSObject, ObservableObject,
 **关键实现点：**
 
 - `startRunning()` / `stopRunning()` 必须在专用串行队列执行，避免阻塞主线程（性能指标：冷启动 ≤ 1.5s）。
-- **去重（F1.6）**：记录 `(lastContent, lastTime)`，相同内容且间隔 < 2s 的回调直接丢弃；
-  结果卡片弹出期间对仍在画面中的同一码**持续滑动窗口**——关闭卡片时若镜头还对着同一个码，
-  不会立即重复落库、卡片也不会秒弹回；换一个码则立即识别。
+- **去重（F1.6）**：按内容维护滑动窗口字典 `[String: Date]`——每次看到某内容就刷新其时间戳，
+  距上次看到 < 2s 则不触发；码持续在画面中时窗口一直滑动，只有离开视野满 2s 后才会再次触发。
+  按内容分键（而非单一 last-content 槽位）是为了多个码同框交替识别时互不打断窗口，
+  避免横幅闪烁与记录刷屏；字典超 64 项时清理过期项。
 - **会话生命周期（F1.9）**：以 `selectedTab` 变化驱动 `start()/stop()`；同时监听 `scenePhase`，
   进后台 `stop()`、回前台且当前 Tab 为扫码页时 `start()`。
 - **中断恢复**：控制器维护 `wantsRunning` 意图标志（`start()` 置 true、`stop()` 置 false），
@@ -146,7 +147,7 @@ final class ScannerController: NSObject, ObservableObject,
   乘以捏合倍率；`setZoom` 钳制到 `[minAvailableVideoZoomFactor, min(maxAvailable, 8)]`
   （数码变焦超过 8x 对识别没有意义），主线程乐观更新、会话队列写硬件；
   画面上显示当前倍率角标（>1.0 时）。
-- 识别成功后通过 `latestScan != nil` 抑制新结果发布，待结果卡片关闭后恢复。
+- 识别结果以**非阻塞横幅**呈现，扫描不暂停；`latestScan` 仅驱动横幅内容，不再作为抑制门。
 
 ### 3.3 扫码到落库的数据流
 
@@ -160,11 +161,11 @@ AVCaptureMetadataOutput delegate
  MainActor: latestScan 更新
         │
         ├──► HapticFeedback.success()        // 震动
-        ├──► ScanResultSheet 弹出             // sheet(item:)
+        ├──► ScanResultBanner 横幅滑入         // 4s 自动消失，新结果即时替换
         └──► modelContext.insert(ScanRecord)  // 立即落库，与 UI 展示解耦
 ```
 
-记录写入不依赖用户对结果卡片的操作——识别成功即落库（F1.5），保证「记录写入成功率 100%」。
+记录写入不依赖用户对横幅的任何操作——识别成功即落库（F1.5），保证「记录写入成功率 100%」。
 
 ### 3.4 RootTabView
 
@@ -189,11 +190,13 @@ TabView(selection: $selectedTab) {
   - `.denied / .restricted` → 引导视图 + 按钮跳转 `UIApplication.openSettingsURLString`
   - `.authorized` → 相机预览
 
-### 3.6 结果卡片（ScanResultSheet）
+### 3.6 结果横幅（ScanResultBanner）
 
-- `.sheet(item:)` + `presentationDetents([.height(360)])`，不打断取景视觉。
-- URL 判定：`URL(string:)` 解析成功且 scheme 为 `http/https` 视为链接；主按钮 `openURL` 环境值打开。
-- 复制用 `UIPasteboard.general.string`；分享用 `ShareLink`。
+- 顶部覆盖层（非模态），`move(edge: .top) + opacity` 转场滑入；4 秒自动消失
+  （`ScanView` 持有可取消的 dismiss Task，新结果到来时重置计时并即时替换横幅）。
+- 扫描不因横幅暂停——用户可以连续扫码，无需任何手动关闭操作。
+- URL 判定：`URL(string:)` 解析成功且 scheme 为 `http/https` 视为链接；横幅提供「打开链接」图标按钮。
+- 复制用 `UIPasteboard.general.string`（1.5s 对勾反馈）；分享入口收敛到记录详情页（`ShareLink`）。
 
 ## 4. 异常与边界
 
@@ -223,7 +226,7 @@ TabView(selection: $selectedTab) {
 1. 删除模板 `Item.swift` 与 `ContentView.swift`，新建 `ScanRecord` 并更新 `LibraScanApp` 的 Schema。
 2. 搭建 `RootTabView` 双 Tab 骨架与空白 `HistoryView`。
 3. 实现 `ScannerController` + `ScannerPreview`，跑通真机识别回调。
-4. 实现结果卡片、震动、落库与去重。
+4. 实现结果横幅、震动、落库与去重。
 5. 实现记录列表 / 详情 / 删除 / 清空。
 6. 权限引导、手电筒、中断恢复等边界处理。
 7. 本地化（zh-Hans / en）与无障碍标签收尾。

@@ -23,7 +23,7 @@ final class ScannerController: NSObject, ObservableObject {
 
     private var minZoom: CGFloat = 1
     private var maxZoom: CGFloat = 1
-    /// Non-nil while a scan result card is presented; scanning is suppressed until it is dismissed.
+    /// Most recent scan, shown as a transient banner; scanning continues uninterrupted.
     @Published var latestScan: ScanPayload?
 
     nonisolated(unsafe) let session = AVCaptureSession()
@@ -40,8 +40,10 @@ final class ScannerController: NSObject, ObservableObject {
     /// camera never restarts while the scan screen is not the active surface.
     private var wantsRunning = false
 
-    private var lastContent: String?
-    private var lastScanDate = Date.distantPast
+    /// Per-content sliding dedup windows. Keyed by content (not a single last-scan
+    /// slot) so two codes alternating in frame don't break each other's window and
+    /// spam the banner and history.
+    private var recentScans: [String: Date] = [:]
     private let dedupWindow: TimeInterval = 2
 
     private nonisolated(unsafe) var observers: [NSObjectProtocol] = []
@@ -192,22 +194,16 @@ extension ScannerController: @preconcurrency AVCaptureMetadataOutputObjectsDeleg
         else { return }
 
         let now = Date()
-        if latestScan != nil {
-            // Result card is up: suppress new scans, but keep the dedup window sliding
-            // for the code still in frame so dismissing the card doesn't instantly
-            // re-record it. A different code is left untouched and fires right away.
-            if content == lastContent {
-                lastScanDate = now
-            }
+        if recentScans.count > 64 {
+            recentScans = recentScans.filter { now.timeIntervalSince($0.value) < dedupWindow }
+        }
+        let lastSeen = recentScans[content]
+        // Always refresh: the window keeps sliding while a code stays in frame,
+        // so it only re-fires after being out of view for the full window.
+        recentScans[content] = now
+        if let lastSeen, now.timeIntervalSince(lastSeen) < dedupWindow {
             return
         }
-        if content == lastContent, now.timeIntervalSince(lastScanDate) < dedupWindow {
-            // Keep the window sliding while the camera stays on the same code.
-            lastScanDate = now
-            return
-        }
-        lastContent = content
-        lastScanDate = now
         latestScan = ScanPayload(content: content, symbology: code.type.displayName)
     }
 }

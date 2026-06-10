@@ -14,6 +14,9 @@ struct ScanView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var scanner = ScannerController()
     @GestureState private var pinchAnchor: CGFloat?
+    @State private var bannerDismissTask: Task<Void, Never>?
+
+    private let bannerDuration: Duration = .seconds(4)
 
     var body: some View {
         ZStack {
@@ -63,9 +66,16 @@ struct ScanView: View {
             guard let payload else { return }
             HapticFeedback.success()
             modelContext.insert(ScanRecord(content: payload.content, symbology: payload.symbology))
+            scheduleBannerDismiss(for: payload)
         }
-        .sheet(item: $scanner.latestScan) { payload in
-            ScanResultSheet(payload: payload)
+    }
+
+    private func scheduleBannerDismiss(for payload: ScanPayload) {
+        bannerDismissTask?.cancel()
+        bannerDismissTask = Task {
+            try? await Task.sleep(for: bannerDuration)
+            guard !Task.isCancelled, scanner.latestScan?.id == payload.id else { return }
+            scanner.latestScan = nil
         }
     }
 
@@ -94,6 +104,17 @@ struct ScanView: View {
                 }
             }
             .padding(.bottom, 32)
+
+            VStack {
+                if let payload = scanner.latestScan {
+                    ScanResultBanner(payload: payload)
+                        .id(payload.id)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+                Spacer()
+            }
+            .padding(.top, 8)
+            .animation(.snappy, value: scanner.latestScan)
         }
         .contentShape(Rectangle())
         .gesture(zoomGesture)
