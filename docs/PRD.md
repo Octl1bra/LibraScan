@@ -107,3 +107,4 @@ LibraScan 是一款极简的 iPhone 扫码工具，支持扫描二维码（QR Co
 | v1.0 | 双 Tab：扫码 + 本地记录（本文档范围） |
 | v1.1 | 相册图片识别、批量连扫、记录搜索增强 |
 | v1.2 | 二维码生成、记录导出（CSV） |
+| v2.0 | Mac 键入桥：扫码内容经局域网模拟键入 Mac（详见 [MAC_KEY_BRIDGE.md](./MAC_KEY_BRIDGE.md)） |
