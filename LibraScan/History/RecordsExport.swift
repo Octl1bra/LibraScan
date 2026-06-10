@@ -25,18 +25,15 @@ nonisolated struct RecordsExport: Transferable {
     }
 
     private func writeToTemporaryFile() throws -> URL {
-        let nameFormatter = DateFormatter()
-        nameFormatter.locale = Locale(identifier: "en_US_POSIX")
-        nameFormatter.dateFormat = "yyyyddMM HH:mm"
-        let filename = "LibraScan Record \(nameFormatter.string(from: .now)).txt"
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
 
-        let lineFormatter = DateFormatter()
-        lineFormatter.locale = Locale(identifier: "en_US_POSIX")
-        lineFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let filename = "LibraScan Record \(formatter.string(from: .now)).txt"
 
         var text = ""
         for row in rows {
-            text += "[\(lineFormatter.string(from: row.scannedAt))] [\(row.symbology)]\n"
+            text += "[\(formatter.string(from: row.scannedAt))] [\(row.symbology)]\n"
             text += row.content
             text += "\n\n"
         }
