@@ -1,0 +1,256 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Accessibility permission is required to type." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要辅助功能权限才能模拟键入。"
+          }
+        }
+      }
+    },
+    "After typing a code" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "键入完成后"
+          }
+        }
+      }
+    },
+    "Allow" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许"
+          }
+        }
+      }
+    },
+    "Allow “%@” to connect?" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许“%@”连接吗？"
+          }
+        }
+      }
+    },
+    "Automatically accept trusted devices" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动接受已信任的设备"
+          }
+        }
+      }
+    },
+    "Click to copy" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击复制"
+          }
+        }
+      }
+    },
+    "Codes scanned on this iPhone will be typed into whatever text field has focus on this Mac." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这台 iPhone 扫到的内容将被键入到这台 Mac 当前聚焦的输入框中。"
+          }
+        }
+      }
+    },
+    "Connected to %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已连接 %@"
+          }
+        }
+      }
+    },
+    "Disconnect" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "断开"
+          }
+        }
+      }
+    },
+    "Do nothing" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不做任何事"
+          }
+        }
+      }
+    },
+    "Don’t Allow" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不允许"
+          }
+        }
+      }
+    },
+    "Grant Permission…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "去授权…"
+          }
+        }
+      }
+    },
+    "Keystroke interval" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "键入间隔"
+          }
+        }
+      }
+    },
+    "Nothing typed yet." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有键入过内容。"
+          }
+        }
+      }
+    },
+    "No trusted devices yet." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有信任的设备。"
+          }
+        }
+      }
+    },
+    "Pause typing" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂停键入"
+          }
+        }
+      }
+    },
+    "Press Return" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按下回车"
+          }
+        }
+      }
+    },
+    "Press Tab" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按下 Tab"
+          }
+        }
+      }
+    },
+    "Quit" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出"
+          }
+        }
+      }
+    },
+    "Recent" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近"
+          }
+        }
+      }
+    },
+    "Remove" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除"
+          }
+        }
+      }
+    },
+    "Settings…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置…"
+          }
+        }
+      }
+    },
+    "Trusted devices" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信任的设备"
+          }
+        }
+      }
+    },
+    "Waiting for iPhone…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待 iPhone 连接…"
+          }
+        }
+      }
+    },
+    "%lld ms" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 毫秒"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
