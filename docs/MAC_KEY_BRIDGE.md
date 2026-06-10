@@ -6,7 +6,7 @@
 | 形态 | iOS 端扩展 + macOS 菜单栏 App |
 | 传输 | MultipeerConnectivity（局域网点对点，免服务器） |
 | 文档日期 | 2026-06-10 |
-| 状态 | 设计稿（未实现） |
+| 状态 | Mac 端已实现（独立仓库 [ScanKeyboard](https://github.com/Octl1bra/ScanKeyboard)）；iOS 端 `BridgeClient` 待接入 LibraScan |
 
 ## 1. 概述与场景
 
@@ -230,3 +230,20 @@ iOS 端不受影响。
 5. 辅助功能未授权 / 中途吊销授权的降级表现；
 6. 急停开关与手动确认模式；
 7. Excel、Safari 表单、Terminal、IDE 四类目标的键入兼容性。
+
+## 12. 实现状态
+
+**Mac 端（ScanKeyboard 仓库）已实现**：MC 广播 / 单会话（从 accept 起跟踪、按
+session 身份过滤回调、拒绝并断开孤儿会话）、CGEvent Unicode 键入（20 单元分块、清空
+修饰键标志、暂停/权限在键入时复检）、菜单栏 UI、信任列表（含首配对日期）、
+按连接重置的 seq 去重（重复回执回显原结果）、30s 心跳 + 2 次丢失断开、协议版本门控、
+辅助功能引导。
+
+**待办（iOS 端）**：在 LibraScan 中加 `BridgeClient`（browse/invite/发送/待发队列/重连）、
+扫一扫页「键入到 Mac」入口、横幅回执角标——见第 7 节。
+
+**Backlog（Mac 端，后续里程碑，对抗评审标为可接受的缺口）**：
+- 键入前系统通知预告 + 手动确认模式（§6.2 安全层之二、之三）
+- 全局急停快捷键 ⌥⌘K（目前仅菜单内暂停开关）
+- 粘贴键入方式（剪贴板 + ⌘V）与 >4KB 内容的 `suggest:"paste"` 提示（§5.2 / §8）
+- 菜单栏「正在键入」闪烁态、登录时启动（§6.1）
