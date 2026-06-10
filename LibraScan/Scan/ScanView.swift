@@ -13,6 +13,7 @@ struct ScanView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var scanner = ScannerController()
+    @GestureState private var pinchAnchor: CGFloat?
 
     var body: some View {
         ZStack {
@@ -83,14 +84,41 @@ struct ScanView: View {
                     .shadow(radius: 2)
             }
 
-            VStack {
+            VStack(spacing: 16) {
                 Spacer()
+                if scanner.zoomFactor > 1.01 {
+                    zoomBadge
+                }
                 if scanner.isTorchAvailable {
                     torchButton
-                        .padding(.bottom, 32)
                 }
             }
+            .padding(.bottom, 32)
         }
+        .contentShape(Rectangle())
+        .gesture(zoomGesture)
+    }
+
+    private var zoomGesture: some Gesture {
+        // The anchor must live in @GestureState: it resets on cancellation too
+        // (result sheet presenting mid-pinch, backgrounding), whereas an @State
+        // cleared in onEnded leaks a stale anchor — onEnded never fires when the
+        // system cancels the gesture — and snaps zoom on the next pinch.
+        MagnifyGesture()
+            .updating($pinchAnchor) { value, anchor, _ in
+                let base = anchor ?? scanner.zoomFactor
+                anchor = base
+                scanner.setZoom(base * value.magnification)
+            }
+    }
+
+    private var zoomBadge: some View {
+        Text(verbatim: String(format: "%.1f×", scanner.zoomFactor))
+            .font(.caption.weight(.semibold).monospacedDigit())
+            .foregroundStyle(.white)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(.black.opacity(0.4), in: Capsule())
     }
 
     private var torchButton: some View {

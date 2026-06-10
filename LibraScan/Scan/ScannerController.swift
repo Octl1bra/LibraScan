@@ -19,6 +19,10 @@ final class ScannerController: NSObject, ObservableObject {
     @Published private(set) var isCameraUnavailable = false
     @Published private(set) var isTorchAvailable = false
     @Published private(set) var isTorchOn = false
+    @Published private(set) var zoomFactor: CGFloat = 1
+
+    private var minZoom: CGFloat = 1
+    private var maxZoom: CGFloat = 1
     /// Non-nil while a scan result card is presented; scanning is suppressed until it is dismissed.
     @Published var latestScan: ScanPayload?
 
@@ -111,6 +115,22 @@ final class ScannerController: NSObject, ObservableObject {
         }
     }
 
+    func setZoom(_ factor: CGFloat) {
+        guard let device = videoDevice else { return }
+        let clamped = min(max(factor, minZoom), maxZoom)
+        guard abs(clamped - zoomFactor) > 0.001 else { return }
+        // Optimistic, same as the torch: the gesture reads zoomFactor as its anchor,
+        // so it must reflect the requested value immediately.
+        zoomFactor = clamped
+        sessionQueue.async {
+            do {
+                try device.lockForConfiguration()
+                device.videoZoomFactor = clamped
+                device.unlockForConfiguration()
+            } catch {}
+        }
+    }
+
     // Runs on sessionQueue.
     private nonisolated func configureIfNeeded() {
         guard !isConfigured, !configurationFailed else { return }
@@ -144,9 +164,16 @@ final class ScannerController: NSObject, ObservableObject {
         isConfigured = true
 
         let torchAvailable = device.hasTorch
+        let minZoomFactor = device.minAvailableVideoZoomFactor
+        // Digital zoom beyond ~8x is useless noise for code scanning.
+        let maxZoomFactor = min(device.maxAvailableVideoZoomFactor, 8)
+        let currentZoom = device.videoZoomFactor
         Task { @MainActor in
             self.videoDevice = device
             self.isTorchAvailable = torchAvailable
+            self.minZoom = minZoomFactor
+            self.maxZoom = maxZoomFactor
+            self.zoomFactor = currentZoom
         }
     }
 }

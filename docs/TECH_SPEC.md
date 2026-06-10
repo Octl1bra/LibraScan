@@ -142,6 +142,10 @@ final class ScannerController: NSObject, ObservableObject,
   ——被中断的会话已被系统自动停止（`isRunning == false`），只有显式 `stopRunning()` 才能取消
   AVFoundation 保留的启动请求，否则中断结束后相机会在「记录」Tab 下自行复活。
 - **手电筒**：`isTorchOn` 在主线程乐观更新（连点不丢切换），硬件设置失败时回滚。
+- **变焦（F1.10）**：`ScanView` 上挂 `MagnifyGesture`，以手势起始时的 `zoomFactor` 为锚点
+  乘以捏合倍率；`setZoom` 钳制到 `[minAvailableVideoZoomFactor, min(maxAvailable, 8)]`
+  （数码变焦超过 8x 对识别没有意义），主线程乐观更新、会话队列写硬件；
+  画面上显示当前倍率角标（>1.0 时）。
 - 识别成功后通过 `latestScan != nil` 抑制新结果发布，待结果卡片关闭后恢复。
 
 ### 3.3 扫码到落库的数据流
