@@ -25,9 +25,7 @@
     <a class="brand" href="/"><img src="/assets/icon-512.png" alt="" width="28" height="28">LibraScan</a>
     <ul class="nav-links">
       <li><a href="#how">怎么用</a></li>
-      <li><a href="#download">下载</a></li>
       <li><a href="/support/">支持</a></li>
-      <li><a href="/privacy/">隐私</a></li>
       <li><button class="lang" type="button" data-set-lang="en" aria-label="Switch to English">EN</button></li>
     </ul>
   </header>
@@ -41,7 +39,7 @@
         <a class="btn primary" data-app-store href="#">App Store <span class="tag">即将上架</span></a>
         <a class="btn" data-mac-download href="/download/LibraScan-1.0.dmg">下载 Mac 版 <span class="tag">v<span data-mac-version>1.0</span></span></a>
       </div>
-      <p class="fineprint">iPhone 需要 iOS 18 或更新；Mac 需要 macOS 15 或更新。Mac 版经 Developer ID 签名并由 Apple 公证。</p>
+      <p class="fineprint">iPhone 需要 iOS 18 或更新；Mac 需要 macOS 15 或更新。</p>
 
       <figure class="figure">
         <svg viewBox="0 0 760 270" role="img" aria-labelledby="fig-zh" fill="none" stroke="currentColor" stroke-width="2">
@@ -70,7 +68,6 @@
           <rect class="caret" x="554" y="115" width="2" height="22" fill="currentColor" stroke="none"/>
           <path d="M384 168h180M384 190h120" opacity=".25"/>
         </svg>
-        <figcaption>MultipeerConnectivity 点对点、全程加密、不经任何服务器。</figcaption>
       </figure>
     </section>
 
@@ -83,69 +80,8 @@
       </ol>
     </section>
 
-    <section id="features">
-      <h2>做得少，但做对</h2>
-      <div class="grid">
-        <div>
-          <h3>扫描</h3>
-          <ul>
-            <li>QR、Data Matrix、Aztec、PDF417；EAN-13/8、UPC-E、Code 39/93/128、ITF-14、Codabar</li>
-            <li>记录只存在 iPhone 本地，可搜索、可左滑删除</li>
-            <li>一键导出 TXT，走系统分享</li>
-            <li>支持捏合变焦与手电筒</li>
-          </ul>
-        </div>
-        <div>
-          <h3>键入桥</h3>
-          <ul>
-            <li>中文、emoji 照样键入，与键盘布局无关</li>
-            <li>断线时先排队，重连后按序补发（可关）</li>
-            <li>每条都有回执：已键入 / 未授权 / 已暂停</li>
-            <li>菜单栏一键急停；可配置结尾按键与键入间隔</li>
-          </ul>
-        </div>
-        <div>
-          <h3>隐私</h3>
-          <ul>
-            <li>没有账号、没有服务器、没有统计</li>
-            <li>相机画面不保存、不上传</li>
-            <li>Mac 端最近键入只在内存里保留 5 条</li>
-            <li>信任列表随时可改、可清空</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="download">
-      <h2>下载</h2>
-      <div class="card">
-        <div class="row">
-          <div>
-            <h3 class="tight">LibraScan for Mac <span class="muted">v<span data-mac-version>1.0</span></span></h3>
-            <p class="muted small sub">菜单栏应用 · macOS 15 或更新 · Apple 芯片与 Intel</p>
-          </div>
-          <a class="btn primary" data-mac-download href="/download/LibraScan-1.0.dmg">下载 dmg</a>
-        </div>
-        <dl>
-          <dt>签名</dt><dd>Developer ID Application: Jinrui Hu，已由 Apple 公证</dd>
-          <dt>SHA-256</dt><dd><code data-mac-sha></code></dd>
-          <dt>iPhone 版</dt><dd>App Store 上架后此处会出现链接；届时两端一起更新。</dd>
-        </dl>
-      </div>
-    </section>
-
-    <section id="requirements">
-      <h2>要求</h2>
-      <table>
-        <tr><th>iPhone</th><td>iOS 18 或更新；相机权限；使用键入桥时需要本地网络权限</td></tr>
-        <tr><th>Mac</th><td>macOS 15 或更新；辅助功能权限；本地网络权限</td></tr>
-        <tr><th>连接</th><td>两台设备同时开启 Wi-Fi 与蓝牙即可，不必在同一路由器下（点对点 Wi-Fi）</td></tr>
-      </table>
-    </section>
-
     <section id="faq" class="faq">
       <h2>常见问题</h2>
-      <details><summary>Mac 版为什么不在 Mac App Store？</summary><p>模拟键入依赖的系统权限本身与沙箱兼容，但这类应用的上架审核标准并不稳定。我们选择 Developer ID 签名加 Apple 公证的方式直接分发，安装体验与商店一致，不会被 Gatekeeper 拦下。</p></details>
       <details><summary>为什么需要「辅助功能」权限？</summary><p>macOS 把「向其它应用发送键盘事件」归在辅助功能权限之下。LibraScan 只用它发送按键，不读取屏幕、不监听你的键盘。</p></details>
       <details><summary>我的数据会离开设备吗？</summary><p>不会。扫描记录保存在 iPhone 本地；iPhone 到 Mac 的传输是加密的点对点连接，中间没有服务器，我们也看不到任何内容。</p></details>
       <details><summary>为什么密码框里打不进去？</summary><p>macOS 的安全输入模式会屏蔽一切合成键盘事件，USB 扫码枪也一样。这是系统行为，不是故障。</p></details>
@@ -156,7 +92,7 @@
   <footer>
     <div class="wrap row">
       <span>© 2026 Libra</span>
-      <span><a href="/support/">支持</a> · <a href="/privacy/">隐私政策</a> · <a data-mail href="#">联系</a></span>
+      <span><a href="/support/">支持</a> · <a data-mail href="#">联系</a></span>
     </div>
   </footer>
 </div>
@@ -167,9 +103,7 @@
     <a class="brand" href="/"><img src="/assets/icon-512.png" alt="" width="28" height="28">LibraScan</a>
     <ul class="nav-links">
       <li><a href="#how">How it works</a></li>
-      <li><a href="#download">Download</a></li>
       <li><a href="/support/">Support</a></li>
-      <li><a href="/privacy/">Privacy</a></li>
       <li><button class="lang" type="button" data-set-lang="zh-Hans" aria-label="切换到简体中文">中文</button></li>
     </ul>
   </header>
@@ -183,7 +117,7 @@
         <a class="btn primary" data-app-store href="#">App Store <span class="tag">coming soon</span></a>
         <a class="btn" data-mac-download href="/download/LibraScan-1.0.dmg">Download for Mac <span class="tag">v<span data-mac-version>1.0</span></span></a>
       </div>
-      <p class="fineprint">Requires iOS 18 or later on iPhone and macOS 15 or later on Mac. The Mac app is Developer ID–signed and notarized by Apple.</p>
+      <p class="fineprint">Requires iOS 18 or later on iPhone and macOS 15 or later on Mac.</p>
 
       <figure class="figure">
         <svg viewBox="0 0 760 270" role="img" aria-labelledby="fig-en" fill="none" stroke="currentColor" stroke-width="2">
@@ -209,7 +143,6 @@
           <rect class="caret" x="554" y="115" width="2" height="22" fill="currentColor" stroke="none"/>
           <path d="M384 168h180M384 190h120" opacity=".25"/>
         </svg>
-        <figcaption>Peer-to-peer over MultipeerConnectivity, encrypted end to end, no server in between.</figcaption>
       </figure>
     </section>
 
@@ -222,69 +155,8 @@
       </ol>
     </section>
 
-    <section id="features">
-      <h2>Little, done right</h2>
-      <div class="grid">
-        <div>
-          <h3>Scanning</h3>
-          <ul>
-            <li>QR, Data Matrix, Aztec, PDF417; EAN-13/8, UPC-E, Code 39/93/128, ITF-14, Codabar</li>
-            <li>History stays on the iPhone; searchable, swipe to delete</li>
-            <li>Export everything as a TXT via the share sheet</li>
-            <li>Pinch to zoom, torch for dark shelves</li>
-          </ul>
-        </div>
-        <div>
-          <h3>The bridge</h3>
-          <ul>
-            <li>Types CJK and emoji correctly, independent of keyboard layout</li>
-            <li>Queues scans while offline, replays them in order on reconnect (optional)</li>
-            <li>Every scan gets a receipt: typed, not authorized, paused</li>
-            <li>One-click pause in the menu bar; configurable suffix key and keystroke interval</li>
-          </ul>
-        </div>
-        <div>
-          <h3>Privacy</h3>
-          <ul>
-            <li>No account, no server, no analytics</li>
-            <li>Camera frames are never stored or uploaded</li>
-            <li>The Mac keeps only the last five items, in memory</li>
-            <li>Trusted devices can be removed at any time</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="download">
-      <h2>Download</h2>
-      <div class="card">
-        <div class="row">
-          <div>
-            <h3 class="tight">LibraScan for Mac <span class="muted">v<span data-mac-version>1.0</span></span></h3>
-            <p class="muted small sub">Menu bar app · macOS 15 or later · Apple silicon and Intel</p>
-          </div>
-          <a class="btn primary" data-mac-download href="/download/LibraScan-1.0.dmg">Download dmg</a>
-        </div>
-        <dl>
-          <dt>Signature</dt><dd>Developer ID Application: Jinrui Hu, notarized by Apple</dd>
-          <dt>SHA-256</dt><dd><code data-mac-sha></code></dd>
-          <dt>iPhone</dt><dd>The App Store link will appear here once the app is live; both sides ship together.</dd>
-        </dl>
-      </div>
-    </section>
-
-    <section id="requirements">
-      <h2>Requirements</h2>
-      <table>
-        <tr><th>iPhone</th><td>iOS 18 or later; camera access; Local Network access when using the bridge</td></tr>
-        <tr><th>Mac</th><td>macOS 15 or later; Accessibility permission; Local Network access</td></tr>
-        <tr><th>Connection</th><td>Wi-Fi and Bluetooth on for both devices; the same router is not required (peer-to-peer Wi-Fi)</td></tr>
-      </table>
-    </section>
-
     <section id="faq" class="faq">
       <h2>Questions</h2>
-      <details><summary>Why isn't the Mac app on the Mac App Store?</summary><p>The permission that synthetic typing relies on is compatible with the App Sandbox, but review outcomes for this kind of app are inconsistent. We distribute directly with Developer ID signing and Apple notarization instead — it installs like any other app and Gatekeeper is happy.</p></details>
       <details><summary>Why does it need Accessibility permission?</summary><p>macOS files “send keyboard events to other apps” under Accessibility. LibraScan uses it to post keystrokes and nothing else — it doesn't read the screen or watch your keyboard.</p></details>
       <details><summary>Does my data leave my devices?</summary><p>No. Scan history lives on the iPhone. The iPhone-to-Mac link is an encrypted peer-to-peer connection with no server in between, so there's nothing for us to see.</p></details>
       <details><summary>Why won't it type into a password field?</summary><p>macOS Secure Input blocks all synthetic keyboard events — USB barcode scanners hit the same wall. That's the system working as designed.</p></details>
@@ -295,7 +167,7 @@
   <footer>
     <div class="wrap row">
       <span>© 2026 Libra</span>
-      <span><a href="/support/">Support</a> · <a href="/privacy/">Privacy</a> · <a data-mail href="#">Contact</a></span>
+      <span><a href="/support/">Support</a> · <a data-mail href="#">Contact</a></span>
     </div>
   </footer>
 </div>
