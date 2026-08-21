@@ -9,8 +9,13 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
+# Geometry. Finder stores the window *frame*; the content area is the frame minus the title bar.
+# Background = exact content size (no scrolling, nothing uncovered). Icons sit centred in the space below the title block.
+WIN_W=540; CONTENT_H=${CONTENT_H:-352}; TITLEBAR=${TITLEBAR:-28}
+WIN_H=$((CONTENT_H + TITLEBAR)); ICON_Y=$(( 100 + (CONTENT_H - 100) / 2 ))
+
 # 1. background (1x + 2x → HiDPI TIFF)
-swift "$ROOT/scripts/dmg/background.swift" "$WORK" >/dev/null
+swift "$ROOT/scripts/dmg/background.swift" "$WORK" "$CONTENT_H" "$ICON_Y" >/dev/null
 tiffutil -cathidpicheck "$WORK/background.png" "$WORK/background@2x.png" -out "$WORK/background.tiff" >/dev/null 2>&1
 
 # 2. volume icon from the app icon
@@ -35,5 +40,6 @@ done
   -D app="$WORK/src/LibraScan.app" \
   -D background="$WORK/background.tiff" \
   -D volicon="$WORK/LibraScan.icns" \
+  -D win_h="$WIN_H" -D icon_y="$ICON_Y" \
   "LibraScan" "$OUT/LibraScan-$VERSION.dmg"
 echo "built $OUT/LibraScan-$VERSION.dmg"

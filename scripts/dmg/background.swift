@@ -1,8 +1,12 @@
-// Renders the dmg window background (540×380 pt) at 1x and 2x.
+// Renders the dmg window background (540 × <content height> pt) at 1x and 2x.
+// Usage: swift background.swift <out-dir> [contentHeight] [iconRowY]
 // Same visual system as scan.libra.wiki: paper, ink, one hairline, a dashed arrow.
 import AppKit
 
-let W: CGFloat = 540, H: CGFloat = 380
+let args = CommandLine.arguments
+let W: CGFloat = 540
+let H: CGFloat = args.count > 2 ? CGFloat(Double(args[2])!) : 352   // Finder content height
+let iconY: CGFloat = args.count > 3 ? CGFloat(Double(args[3])!) : 226  // icon row centre
 func rgb(_ hex: UInt32) -> NSColor {
     NSColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
             blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
@@ -38,25 +42,20 @@ func render(scale: CGFloat) -> NSBitmapImageRep {
     let rule = NSBezierPath(); rule.lineWidth = 1
     rule.move(to: NSPoint(x: 40, y: H - 100.5)); rule.line(to: NSPoint(x: W - 40, y: H - 100.5)); rule.stroke()
 
-    // Dashed arrow between the two icon slots (icon centres at x=140 and x=400, y=190; icons are 128 pt)
+    // Dashed arrow between the two icon slots (icon centres at x=140 and x=400 on the icon row; icons are 128 pt)
     ink.setStroke()
     let arrow = NSBezierPath(); arrow.lineWidth = 2; arrow.lineCapStyle = .round; arrow.lineJoinStyle = .round
     arrow.setLineDash([1, 9], count: 2, phase: 0)
-    arrow.move(to: NSPoint(x: 222, y: H - 190)); arrow.line(to: NSPoint(x: 308, y: H - 190)); arrow.stroke()
+    arrow.move(to: NSPoint(x: 222, y: H - iconY)); arrow.line(to: NSPoint(x: 308, y: H - iconY)); arrow.stroke()
     let head = NSBezierPath(); head.lineWidth = 2; head.lineCapStyle = .round; head.lineJoinStyle = .round
-    head.move(to: NSPoint(x: 310, y: H - 182)); head.line(to: NSPoint(x: 320, y: H - 190)); head.line(to: NSPoint(x: 310, y: H - 198)); head.stroke()
-
-    // Footer notes
-    text("首次启动请按引导开启「辅助功能」权限，仅用于发送按键。", x: 40, top: 318, size: 11.5, weight: .regular, color: muted)
-    text("On first launch, allow Accessibility — it's only used to post keystrokes.", x: 40, top: 336, size: 11.5, weight: .regular, color: muted)
-    text("scan.libra.wiki", x: W - 40, top: 318, size: 11.5, weight: .medium, color: muted, alignRight: true)
+    head.move(to: NSPoint(x: 310, y: H - iconY + 8)); head.line(to: NSPoint(x: 320, y: H - iconY)); head.line(to: NSPoint(x: 310, y: H - iconY - 8)); head.stroke()
 
     NSGraphicsContext.current?.flushGraphics()
     NSGraphicsContext.restoreGraphicsState()
     return rep
 }
 
-let out = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "."
+let out = args.count > 1 ? args[1] : "."
 for (scale, name) in [(CGFloat(1), "background.png"), (CGFloat(2), "background@2x.png")] {
     let rep = render(scale: scale)
     let data = rep.representation(using: .png, properties: [:])!

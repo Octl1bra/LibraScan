@@ -12,7 +12,9 @@ hide_extension = [appname]
 icon = defines.get('volicon')          # volume icon (.icns)
 background = defines['background']     # HiDPI TIFF, 540×380 pt
 
-window_rect = ((200, 120), (540, 380))
+win_h = int(defines.get('win_h', 380))      # window *frame* height as Finder stores it
+icon_y = int(defines.get('icon_y', 226))    # icon row centre, in content coordinates
+window_rect = ((200, 120), (540, win_h))
 default_view = 'icon-view'
 show_status_bar = False
 show_tab_view = False
@@ -30,4 +32,4 @@ label_pos = 'bottom'
 show_icon_preview = False
 include_icon_view_settings = 'auto'
 include_list_view_settings = 'auto'
-icon_locations = {appname: (140, 190), 'Applications': (400, 190)}
+icon_locations = {appname: (140, icon_y), 'Applications': (400, icon_y)}
