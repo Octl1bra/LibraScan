@@ -84,9 +84,18 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5p
 .hero p.lede { font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--muted); max-width: var(--measure); margin: 0 0 2rem; }
 .cta { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; align-items: center; }
 .btn {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  padding: 0.8rem 1.25rem; border-radius: 999px; font-weight: 600; font-size: 1rem;
+  display: inline-flex; align-items: center; gap: 0.5rem; height: 48px;
+  padding: 0 1.25rem; border-radius: 999px; font-weight: 600; font-size: 1rem;
   border: 1px solid var(--ink); color: var(--ink); background: transparent; line-height: 1.2;
+}
+/* Apple's App Store badge: official artwork, unmodified, ≥40px tall, clear space ≥ ¼ height (the .cta gap). */
+.badge { display: inline-flex; line-height: 0; }
+.badge:hover { text-decoration: none; opacity: 0.9; }
+.badge img { height: 48px; width: auto; }
+.badge[hidden], .coming[hidden] { display: none; }
+.coming {
+  display: inline-flex; align-items: center; height: 48px; padding: 0 1.1rem;
+  border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-size: 0.95rem;
 }
 .btn:hover { text-decoration: none; background: var(--ink); color: var(--paper); }
 .btn.primary { background: var(--ink); color: var(--paper); }

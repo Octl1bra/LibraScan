@@ -38,15 +38,19 @@
     document.querySelectorAll("[data-mac-version]").forEach((el) => (el.textContent = CONFIG.macVersion));
     document.querySelectorAll("[data-mac-sha]").forEach((el) => (el.textContent = CONFIG.macSHA256));
     document.querySelectorAll("[data-mac-download]").forEach((a) => (a.href = CONFIG.macDownloadURL));
+    // Apple's badge may only appear linked to the product page, so it stays
+    // hidden until appStoreURL is filled in; a plain "coming soon" pill shows meanwhile.
     document.querySelectorAll("[data-app-store]").forEach((a) => {
       if (CONFIG.appStoreURL) {
         a.href = CONFIG.appStoreURL;
-        a.removeAttribute("aria-disabled");
-        a.querySelector(".tag")?.remove();
+        a.hidden = false;
       } else {
-        a.setAttribute("aria-disabled", "true");
-        a.setAttribute("href", "#");
+        a.removeAttribute("href");
+        a.hidden = true;
       }
+    });
+    document.querySelectorAll("[data-app-store-soon]").forEach((el) => {
+      el.hidden = Boolean(CONFIG.appStoreURL);
     });
   }
 
