@@ -23,7 +23,7 @@ iPhone (LibraScan)  ──扫码──►  MultipeerConnectivity（加密 P2P，
 | `LibraScanMac/` | macOS 源码：`Bridge/BridgeServer.swift`、`Typing/TypingEngine.swift`、`UI/` |
 | `Shared/` | `BridgeMessage.swift`——两端共用的线上协议，只此一份 |
 | `docs/` | [PRD](docs/PRD.md) · [技术设计](docs/TECH_SPEC.md) · [Mac 键入桥设计](docs/MAC_KEY_BRIDGE.md) |
-| `site/` | 官网 [scan.libra.wiki](https://scan.libra.wiki)：纯静态 HTML/CSS，中英双语，部署在 Cloudflare Pages（`site/deploy.sh`）。含隐私政策与支持页，即 App Store 所需的两个 URL |
+| `site/` | 官网 [scan.libra.wiki](https://scan.libra.wiki)：单页、纯静态 HTML/CSS、中英双语，部署在 Cloudflare Pages（`site/deploy.sh`） |
 
 版本号（`MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`）定义在工程级，两端共用；发版时只改一处。
 
