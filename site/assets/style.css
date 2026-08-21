@@ -63,7 +63,6 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5p
   padding: 1.1rem 0;
 }
 .brand { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--ink); font-weight: 600; letter-spacing: -0.01em; }
-.brand img { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--line); }
 .brand:hover { text-decoration: none; }
 .nav-links { display: flex; align-items: center; gap: 1.4rem; margin: 0; padding: 0; list-style: none; }
 .nav-links a { color: var(--ink); font-size: 0.95rem; }
