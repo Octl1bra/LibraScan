@@ -80,8 +80,9 @@ xcodebuild archive -project LibraScan.xcodeproj -scheme LibraScanMac -archivePat
 xcodebuild -exportArchive -archivePath build/LibraScanMac.xcarchive -exportOptionsPlist <(printf '<plist version="1.0"><dict><key>method</key><string>developer-id</string><key>signingStyle</key><string>automatic</string><key>teamID</key><string>6NK6HJKB8Z</string><key>destination</key><string>upload</string></dict></plist>') -exportPath build/mac-upload -allowProvisioningUpdates
 xcodebuild -exportNotarizedApp -archivePath build/LibraScanMac.xcarchive -exportPath build/mac-notarized   # 公证未完成时会报错，稍后重试
 create-dmg --volname LibraScan --app-drop-link 400 190 --icon LibraScan.app 140 190 --skip-jenkins build/LibraScan-1.0.dmg build/mac-notarized
-codesign --sign "Developer ID Application" --timestamp build/LibraScan-1.0.dmg
 ```
+
+dmg 本身不签名、不公证：Xcode 自动创建的 Developer ID / Apple Distribution 证书是**云托管**的，私钥不在本机钥匙串，`xcodebuild -exportArchive` 能签而本地 `codesign` 找不到身份。Gatekeeper 校验的是 dmg 里的 app（已 staple，`spctl` 给出 `Notarized Developer ID`），这已足够。若以后要给 dmg 签名公证，需在开发者后台用 CSR 手动建一张非托管的 Developer ID Application 证书，并为 `notarytool` 配 App Store Connect API key。
 
 Mac 端脱离商店没有自动更新；协议带版本号（`BridgeMessage.v`），不匹配时回 `unsupported`，不会乱键入。
 
