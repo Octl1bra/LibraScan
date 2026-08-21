@@ -30,12 +30,12 @@ enum BridgeState: Equatable {
 }
 
 /// iOS side of the Mac keyboard bridge: browses for the `librascan-key`
-/// service advertised by ScanKeyboard, pushes scans over an encrypted
+/// service advertised by LibraScan for Mac, pushes scans over an encrypted
 /// MCSession, and tracks per-payload delivery from the Mac's acks.
 /// Scans always land in local history first — the bridge is a side channel.
 @MainActor
 final class BridgeClient: NSObject, ObservableObject {
-    /// Must match `BridgeServer.serviceType` in the ScanKeyboard repo.
+    /// Must match `BridgeServer.serviceType` in LibraScanMac/Bridge/BridgeServer.swift.
     static let serviceType = "librascan-key"
 
     @Published private(set) var state: BridgeState = .off

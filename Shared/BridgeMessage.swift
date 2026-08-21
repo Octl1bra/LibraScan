@@ -1,9 +1,9 @@
 //
 //  BridgeMessage.swift
-//  ScanKeyboard
+//  LibraScan (Shared)
 //
-//  Wire protocol shared with the iOS LibraScan app.
-//  Keep in sync with docs/MAC_KEY_BRIDGE.md in the LibraScan repo.
+//  Wire protocol between LibraScan for iOS (BridgeClient) and LibraScan for Mac
+//  (BridgeServer). One file, compiled into both targets.
 //
 
 import Foundation

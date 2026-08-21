@@ -1,6 +1,6 @@
 //
 //  MenuContentView.swift
-//  ScanKeyboard
+//  LibraScan for Mac
 //
 
 import AppKit

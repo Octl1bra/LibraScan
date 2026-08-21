@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSLocalNetworkUsageDescription" : {
+      "comment" : "Privacy - Local Network Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "LibraScan uses the local network to receive codes scanned with LibraScan on your iPhone. Data never leaves your network."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LibraScan 使用本地网络接收 iPhone 上 LibraScan 扫到的内容，数据不会离开本地网络。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

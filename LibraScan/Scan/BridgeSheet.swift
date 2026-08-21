@@ -112,7 +112,7 @@ struct BridgeSheet: View {
                 if bridge.wantsConnection, let lastMac = bridge.lastMacName {
                     Text("Will automatically reconnect to “\(lastMac)”.")
                 }
-                Text("Make sure Wi-Fi and Bluetooth are on for both devices, and LibraScan Key is running on the Mac.")
+                Text("Make sure Wi-Fi and Bluetooth are on for both devices, and LibraScan is running on the Mac.")
                 if bridge.didBrowseFail || bridge.nearbyMacs.isEmpty {
                     Text("If no Macs appear, check that LibraScan is allowed to use the Local Network in Settings.")
                 }

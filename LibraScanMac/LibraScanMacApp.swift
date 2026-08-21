@@ -1,13 +1,13 @@
 //
-//  ScanKeyboardApp.swift
-//  ScanKeyboard
+//  LibraScanMacApp.swift
+//  LibraScan for Mac
 //
 
 import AppKit
 import SwiftUI
 
 @main
-struct ScanKeyboardApp: App {
+struct LibraScanMacApp: App {
     @NSApplicationDelegateAdaptor(ReopenDelegate.self) private var reopenDelegate
     @StateObject private var server = BridgeServer()
 

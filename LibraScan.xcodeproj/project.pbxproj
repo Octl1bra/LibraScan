@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		86B181562FD9846A001037CC /* LibraScan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LibraScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A11BC0DE0000000000000002 /* LibraScan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LibraScan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -17,6 +18,13 @@
 				Info.plist,
 			);
 			target = 86B181552FD9846A001037CC /* LibraScan */;
+		};
+		A11BC0DE0000000000000004 /* Exceptions for "LibraScanMac" folder in "LibraScanMac" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A11BC0DE0000000000000001 /* LibraScanMac */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -29,10 +37,30 @@
 			path = LibraScan;
 			sourceTree = "<group>";
 		};
+		A11BC0DE0000000000000003 /* LibraScanMac */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A11BC0DE0000000000000004 /* Exceptions for "LibraScanMac" folder in "LibraScanMac" target */,
+			);
+			path = LibraScanMac;
+			sourceTree = "<group>";
+		};
+		A11BC0DE0000000000000005 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		86B181532FD9846A001037CC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A11BC0DE0000000000000006 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +74,8 @@
 			isa = PBXGroup;
 			children = (
 				86B181582FD9846A001037CC /* LibraScan */,
+				A11BC0DE0000000000000003 /* LibraScanMac */,
+				A11BC0DE0000000000000005 /* Shared */,
 				86B181572FD9846A001037CC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				86B181562FD9846A001037CC /* LibraScan.app */,
+				A11BC0DE0000000000000002 /* LibraScan.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,12 +106,36 @@
 			);
 			fileSystemSynchronizedGroups = (
 				86B181582FD9846A001037CC /* LibraScan */,
+				A11BC0DE0000000000000005 /* Shared */,
 			);
 			name = LibraScan;
 			packageProductDependencies = (
 			);
 			productName = LibraScan;
 			productReference = 86B181562FD9846A001037CC /* LibraScan.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A11BC0DE0000000000000001 /* LibraScanMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A11BC0DE000000000000000B /* Build configuration list for PBXNativeTarget "LibraScanMac" */;
+			buildPhases = (
+				A11BC0DE0000000000000008 /* Sources */,
+				A11BC0DE0000000000000006 /* Frameworks */,
+				A11BC0DE0000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A11BC0DE0000000000000003 /* LibraScanMac */,
+				A11BC0DE0000000000000005 /* Shared */,
+			);
+			name = LibraScanMac;
+			packageProductDependencies = (
+			);
+			productName = LibraScan;
+			productReference = A11BC0DE0000000000000002 /* LibraScan.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -94,6 +149,9 @@
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					86B181552FD9846A001037CC = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+					A11BC0DE0000000000000001 = {
 						CreatedOnToolsVersion = 26.4.1;
 					};
 				};
@@ -114,6 +172,7 @@
 			projectRoot = "";
 			targets = (
 				86B181552FD9846A001037CC /* LibraScan */,
+				A11BC0DE0000000000000001 /* LibraScanMac */,
 			);
 		};
 /* End PBXProject section */
@@ -126,10 +185,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A11BC0DE0000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		86B181522FD9846A001037CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A11BC0DE0000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -173,6 +246,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -192,8 +266,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -237,6 +312,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -250,8 +326,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -266,7 +343,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -280,10 +356,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Libra.LibraScan;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Libra.Scan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -299,7 +375,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -313,16 +388,76 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Libra.LibraScan;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Libra.Scan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A11BC0DE0000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LibraScanMac/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Libra.Scan;
+				PRODUCT_NAME = LibraScan;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A11BC0DE000000000000000A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 6NK6HJKB8Z;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LibraScanMac/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Libra.Scan;
+				PRODUCT_NAME = LibraScan;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -343,6 +478,15 @@
 			buildConfigurations = (
 				86B181642FD9846B001037CC /* Debug */,
 				86B181652FD9846B001037CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A11BC0DE000000000000000B /* Build configuration list for PBXNativeTarget "LibraScanMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A11BC0DE0000000000000009 /* Debug */,
+				A11BC0DE000000000000000A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

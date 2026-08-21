@@ -1,6 +1,6 @@
 //
 //  BridgeServer.swift
-//  ScanKeyboard
+//  LibraScan for Mac
 //
 
 import AppKit

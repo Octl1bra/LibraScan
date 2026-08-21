@@ -2,14 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>LSUIElement</key>
 	<true/>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>ScanKeyboard uses the local network to receive scanned codes from LibraScan on your iPhone.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_librascan-key._tcp</string>
 		<string>_librascan-key._udp</string>
 	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>LibraScan uses the local network to receive codes scanned with LibraScan on your iPhone. Data never leaves your network.</string>
 </dict>
 </plist>

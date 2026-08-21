@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2640"
+   LastUpgradeVersion = "2660"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C0DE5CA00000000000000006"
-               BuildableName = "ScanKeyboard.app"
-               BlueprintName = "ScanKeyboard"
-               ReferencedContainer = "container:ScanKeyboard.xcodeproj">
+               BlueprintIdentifier = "A11BC0DE0000000000000001"
+               BuildableName = "LibraScan.app"
+               BlueprintName = "LibraScanMac"
+               ReferencedContainer = "container:LibraScan.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,10 +43,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C0DE5CA00000000000000006"
-            BuildableName = "ScanKeyboard.app"
-            BlueprintName = "ScanKeyboard"
-            ReferencedContainer = "container:ScanKeyboard.xcodeproj">
+            BlueprintIdentifier = "A11BC0DE0000000000000001"
+            BuildableName = "LibraScan.app"
+            BlueprintName = "LibraScanMac"
+            ReferencedContainer = "container:LibraScan.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -60,10 +60,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C0DE5CA00000000000000006"
-            BuildableName = "ScanKeyboard.app"
-            BlueprintName = "ScanKeyboard"
-            ReferencedContainer = "container:ScanKeyboard.xcodeproj">
+            BlueprintIdentifier = "A11BC0DE0000000000000001"
+            BuildableName = "LibraScan.app"
+            BlueprintName = "LibraScanMac"
+            ReferencedContainer = "container:LibraScan.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -1,6 +1,6 @@
 //
 //  TypingEngine.swift
-//  ScanKeyboard
+//  LibraScan for Mac
 //
 
 import ApplicationServices
@@ -37,7 +37,7 @@ final class TypingEngine {
     /// CGEvent carries at most 20 UTF-16 code units per keyboard event.
     private nonisolated static let chunkSize = 20
 
-    private nonisolated let queue = DispatchQueue(label: "com.Libra.ScanKeyboard.typing")
+    private nonisolated let queue = DispatchQueue(label: "com.Libra.Scan.typing")
     /// Read on the typing queue before/while typing so a pause takes effect even
     /// for jobs already queued or a long payload mid-flight.
     private nonisolated let pausedFlag = OSAllocatedUnfairLock(initialState: false)

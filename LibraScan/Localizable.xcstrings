@@ -231,12 +231,12 @@
         }
       }
     },
-    "Make sure Wi-Fi and Bluetooth are on for both devices, and LibraScan Key is running on the Mac." : {
+    "Make sure Wi-Fi and Bluetooth are on for both devices, and LibraScan is running on the Mac." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请确保两台设备都已开启 Wi-Fi 与蓝牙，且 Mac 上正在运行 LibraScan Key。"
+            "value" : "请确保两台设备都已开启 Wi-Fi 与蓝牙，且 Mac 上正在运行 LibraScan。"
           }
         }
       }
