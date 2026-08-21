@@ -9,5 +9,13 @@
   Cache-Control: public, max-age=604800
 
 /download/*
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=300
   Content-Disposition: attachment
+
+/dl/*
+  Cache-Control: public, max-age=300
+  Content-Disposition: attachment
+
+/review/*
+  Cache-Control: public, max-age=300
+  X-Robots-Tag: noindex, nofollow
