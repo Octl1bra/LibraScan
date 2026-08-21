@@ -14,3 +14,7 @@ build/
 # Swift Package Manager
 .swiftpm/
 .build/
+
+# local tool config
+.claude/
+site/download/
