@@ -6,7 +6,7 @@
 | 形态 | iOS 端扩展 + macOS 菜单栏 App |
 | 传输 | MultipeerConnectivity（局域网点对点，免服务器） |
 | 文档日期 | 2026-06-10 |
-| 状态 | 双端已实现：Mac 端见独立仓库 [ScanKeyboard](https://github.com/Octl1bra/ScanKeyboard)；iOS 端 `BridgeClient` 已接入 LibraScan |
+| 状态 | 双端已实现，同仓库：Mac 端 `LibraScanMac/`，iOS 端 `LibraScan/Bridge/`，协议 `Shared/BridgeMessage.swift`（两端共用一份） |
 
 ## 1. 概述与场景
 
@@ -176,11 +176,21 @@ IME 截断——文档化为已知限制，建议录入场景切英文输入法�
   可在设置中改为「手动确认模式」：点通知才键入（高安全场景）。
 - 「暂停键入」全局开关 + 可配置快捷键（默认 ⌥⌘K）。
 
-### 6.3 分发说明（重要约束）
+### 6.3 分发说明
 
-模拟键盘事件与 App Store 沙箱不兼容（Accessibility API 限制）：
-**macOS 端走 Developer ID 签名 + 公证的直接分发**（dmg/zip），不上 MAS。
-iOS 端不受影响。
+**macOS 端走 Developer ID 签名 + 公证的直接分发**（dmg），iOS 端走 App Store。
+两端 bundle ID 同为 `com.Libra.Scan`——Universal Purchase 要求两端同 ID，现在统一是为将来上
+Mac App Store 留门（ASC 上两条独立记录事后不能合并）。
+
+不上 MAS 的原因**不是技术限制**。`CGEvent.post` 依赖的是 `PostEvent` 权限，它与 App Sandbox
+兼容（系统设置里显示在「辅助功能」栏下，但和 AXUIElement 那套真正的 Accessibility API 是两个
+独立权限；Maccy 等沙箱应用已在 MAS 上用同样方式合成 ⌘V）。原因是 App Review 对 2.4.5 的执行
+不一致：2026-03 有同类沙箱应用被以「Accessibility features should not be used for
+non-accessibility purposes」拒审，而本应用的合成键入是核心功能而非附属功能，风险更高。
+
+若将来要上 MAS：开 App Sandbox + `com.apple.security.network.client/server` entitlements；
+事件投递从 `.cghidEventTap` 改为 `.cgSessionEventTap`（HID tap 在沙箱内不工作）；权限检查与
+申请改用 `CGPreflightPostEventAccess` / `CGRequestPostEventAccess`。
 
 ## 7. iOS 端改动
 
@@ -233,7 +243,7 @@ iOS 端不受影响。
 
 ## 12. 实现状态
 
-**Mac 端（ScanKeyboard 仓库）已实现**：MC 广播 / 单会话（从 accept 起跟踪、按
+**Mac 端（`LibraScanMac/`）已实现**：MC 广播 / 单会话（从 accept 起跟踪、按
 session 身份过滤回调、拒绝并断开孤儿会话）、CGEvent Unicode 键入（20 单元分块、清空
 修饰键标志、暂停/权限在键入时复检）、菜单栏 UI、信任列表（含首配对日期）、
 按连接重置的 seq 去重（重复回执回显原结果）、30s 心跳 + 2 次丢失断开、协议版本门控、
@@ -244,7 +254,7 @@ session 身份过滤回调、拒绝并断开孤儿会话）、CGEvent Unicode �
 ack 驱动横幅角标 / 回前台自动重连上次 Mac、退后台断开）、扫一扫页右上角「键入到 Mac」入口
 （连接 sheet：附近 Mac 列表、连接状态、断开、补发开关）、横幅回执角标（待发送 / 发送中 /
 已键入 ✓ / 未授权 · 已暂停 · 失败 ⚠）、`Info.plist` 本地网络权限与 Bonjour 服务声明；
-协议层 `Bridge/BridgeMessage.swift` 与 Mac 端同构，需保持同步。
+协议层 `Shared/BridgeMessage.swift` 两端共用同一文件。
 
 **实现注记（对 §8 的从严处理）**：已发送但断线前未收到 ack 的条目**不补发**、直接标记失败——
 Mac 端 seq 去重按连接重置，跨连接补发可能造成二次键入；内容本身已在本地记录，不丢数据。

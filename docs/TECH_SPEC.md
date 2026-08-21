@@ -86,25 +86,31 @@ final class ScanRecord {
 ### 3.1 文件结构
 
 ```
-LibraScan/
+LibraScan/                        // iOS target
 ├── LibraScanApp.swift            // App 入口，ModelContainer 注入
 ├── RootTabView.swift             // TabView 双 Tab 骨架（AppTab 枚举）
 ├── Scan/
-│   ├── ScanView.swift            // 扫码页：预览 + 扫描框 + 手电筒 + 权限引导
+│   ├── ScanView.swift            // 扫码页：预览 + 扫描框 + 手电筒 + 权限引导 + 「键入到 Mac」入口
 │   ├── ScannerController.swift   // AVCaptureSession 封装（ObservableObject）
 │   ├── ScannerPreview.swift      // UIViewRepresentable 桥接预览层
-│   └── ScanResultBanner.swift    // 顶部结果横幅（非阻塞，含 SymbologyTag）
+│   ├── ScanResultBanner.swift    // 顶部结果横幅（非阻塞，含 SymbologyTag 与桥接回执角标）
+│   └── BridgeSheet.swift         // 连接面板：附近 Mac 列表、连接状态、补发开关
 ├── History/
 │   ├── HistoryView.swift         // 记录列表：@Query 倒序、搜索、左滑删除、清空、导出
 │   ├── HistoryDetailView.swift   // 记录详情：完整内容 + 操作按钮
 │   └── RecordsExport.swift       // 导出 txt（Transferable + FileRepresentation，分享时惰性生成）
+├── Bridge/
+│   └── BridgeClient.swift        // Mac 键入桥 iOS 侧（见 MAC_KEY_BRIDGE.md）
 ├── Models/
 │   └── ScanRecord.swift
-├── Shared/
+├── Shared/                       // iOS 内部共用的小工具（与仓库根目录的 Shared/ 无关）
 │   ├── ContentClassifier.swift   // http(s) 链接判定（模型与视图共用）
 │   └── HapticFeedback.swift
 ├── Localizable.xcstrings         // UI 文案（en 源 + zh-Hans）
-└── InfoPlist.xcstrings           // 相机权限文案本地化
+└── InfoPlist.xcstrings           // 相机 / 本地网络权限文案本地化
+
+Shared/BridgeMessage.swift        // 与 macOS target 共用的线上协议（仓库根目录）
+LibraScanMac/                     // macOS target，见 MAC_KEY_BRIDGE.md
 ```
 
 ### 3.2 ScannerController（核心）
