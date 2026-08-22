@@ -4,6 +4,9 @@
 //
 
 import AVFoundation
+#if DEBUG
+import CoreImage.CIFilterBuiltins
+#endif
 import SwiftData
 import SwiftUI
 
@@ -22,6 +25,88 @@ struct ScanView: View {
 
     var body: some View {
         ZStack {
+            scanSurface
+        }
+        .task {
+#if DEBUG
+            if LibraScanDemoMode.isEnabled {
+                scanner.latestScan = LibraScanDemoMode.scanPayload
+                bridge.send(LibraScanDemoMode.scanPayload, scannedAt: .now)
+                if LibraScanDemoMode.screen == .bridge {
+                    await Task.yield()
+                    isBridgeSheetPresented = true
+                }
+                return
+            }
+#endif
+            await scanner.requestAccessIfNeeded()
+            if isActive {
+                scanner.start()
+            }
+        }
+        .onChange(of: isActive) { _, active in
+#if DEBUG
+            if LibraScanDemoMode.isEnabled { return }
+#endif
+            if active {
+                scanner.start()
+            } else {
+                scanner.stop()
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in
+#if DEBUG
+            if LibraScanDemoMode.isEnabled { return }
+#endif
+            switch phase {
+            case .active:
+                if isActive {
+                    scanner.start()
+                }
+                bridge.sceneDidBecomeActive()
+            case .background:
+                scanner.stop()
+                bridge.sceneDidEnterBackground()
+            default:
+                break
+            }
+        }
+        .onChange(of: scanner.latestScan) { _, payload in
+            guard let payload else { return }
+#if DEBUG
+            if LibraScanDemoMode.isEnabled {
+                bridge.send(payload, scannedAt: .now)
+                return
+            }
+#endif
+            HapticFeedback.success()
+            let record = ScanRecord(content: payload.content, symbology: payload.symbology)
+            modelContext.insert(record)
+            // History is the source of truth; the Mac bridge is a side channel.
+            bridge.send(payload, scannedAt: record.scannedAt)
+            scheduleBannerDismiss(for: payload)
+        }
+        .sheet(isPresented: $isBridgeSheetPresented) {
+            BridgeSheet(bridge: bridge)
+        }
+    }
+
+    @ViewBuilder
+    private var scanSurface: some View {
+#if DEBUG
+        if LibraScanDemoMode.isEnabled {
+            cameraView
+        } else {
+            regularScanSurface
+        }
+#else
+        regularScanSurface
+#endif
+    }
+
+    @ViewBuilder
+    private var regularScanSurface: some View {
+        ZStack {
             switch scanner.authorizationStatus {
             case .authorized:
                 if scanner.isCameraUnavailable {
@@ -39,45 +124,6 @@ struct ScanView: View {
                 }
             }
         }
-        .task {
-            await scanner.requestAccessIfNeeded()
-            if isActive {
-                scanner.start()
-            }
-        }
-        .onChange(of: isActive) { _, active in
-            if active {
-                scanner.start()
-            } else {
-                scanner.stop()
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            switch phase {
-            case .active:
-                if isActive {
-                    scanner.start()
-                }
-                bridge.sceneDidBecomeActive()
-            case .background:
-                scanner.stop()
-                bridge.sceneDidEnterBackground()
-            default:
-                break
-            }
-        }
-        .onChange(of: scanner.latestScan) { _, payload in
-            guard let payload else { return }
-            HapticFeedback.success()
-            let record = ScanRecord(content: payload.content, symbology: payload.symbology)
-            modelContext.insert(record)
-            // History is the source of truth; the Mac bridge is a side channel.
-            bridge.send(payload, scannedAt: record.scannedAt)
-            scheduleBannerDismiss(for: payload)
-        }
-        .sheet(isPresented: $isBridgeSheetPresented) {
-            BridgeSheet(bridge: bridge)
-        }
     }
 
     private func scheduleBannerDismiss(for payload: ScanPayload) {
@@ -91,8 +137,18 @@ struct ScanView: View {
 
     private var cameraView: some View {
         ZStack {
+#if DEBUG
+            if LibraScanDemoMode.isEnabled {
+                DemoCameraPreview()
+                    .ignoresSafeArea()
+            } else {
+                ScannerPreview(session: scanner.session)
+                    .ignoresSafeArea()
+            }
+#else
             ScannerPreview(session: scanner.session)
                 .ignoresSafeArea()
+#endif
 
             VStack(spacing: 24) {
                 RoundedRectangle(cornerRadius: 28)
@@ -184,6 +240,38 @@ struct ScanView: View {
         .accessibilityLabel(scanner.isTorchOn ? Text("Turn torch off") : Text("Turn torch on"))
     }
 }
+
+#if DEBUG
+/// A deliberately simple simulator stand-in for the unavailable camera feed.
+/// The QR is generated locally at runtime; no screenshot-only asset ships.
+private struct DemoCameraPreview: View {
+    private let image = Self.makeQRCode(from: LibraScanDemoMode.scanPayload.content)
+
+    var body: some View {
+        Color(red: 0.055, green: 0.063, blue: 0.075)
+            .overlay {
+                Image(uiImage: image)
+                    .interpolation(.none)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(12)
+                    .frame(width: 178, height: 178)
+                    .background(.white, in: RoundedRectangle(cornerRadius: 8))
+            }
+    }
+
+    private static func makeQRCode(from content: String) -> UIImage {
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = Data(content.utf8)
+        filter.correctionLevel = "M"
+        guard let output = filter.outputImage else { return UIImage() }
+        let scaled = output.transformed(by: CGAffineTransform(scaleX: 12, y: 12))
+        let context = CIContext(options: [.useSoftwareRenderer: true])
+        guard let cgImage = context.createCGImage(scaled, from: scaled.extent) else { return UIImage() }
+        return UIImage(cgImage: cgImage)
+    }
+}
+#endif
 
 private struct PermissionDeniedView: View {
     @Environment(\.openURL) private var openURL

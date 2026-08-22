@@ -14,10 +14,21 @@ struct LibraScanApp: App {
         let schema = Schema([
             ScanRecord.self,
         ])
+#if DEBUG
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: LibraScanDemoMode.isEnabled
+        )
+#else
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+#endif
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+#if DEBUG
+            LibraScanDemoMode.seed(container)
+#endif
+            return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }

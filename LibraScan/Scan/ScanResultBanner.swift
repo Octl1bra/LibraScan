@@ -87,6 +87,21 @@ private struct BridgeDeliveryBadge: View {
     let delivery: BridgeDelivery
 
     var body: some View {
+#if DEBUG
+        if LibraScanDemoMode.isEnabled, delivery == .typed {
+            Text(verbatim: "已键入 Mac ✓")
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(.green)
+                .lineLimit(1)
+        } else {
+            standardLabel
+        }
+#else
+        standardLabel
+#endif
+    }
+
+    private var standardLabel: some View {
         Label(text, systemImage: systemImage)
             .font(.caption2.weight(.medium))
             .foregroundStyle(color)

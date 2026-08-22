@@ -142,17 +142,29 @@ final class BridgeClient: NSObject, ObservableObject {
         UserDefaults.standard.register(defaults: [Self.resendKey: true])
         resendOnReconnect = UserDefaults.standard.bool(forKey: Self.resendKey)
         super.init()
+#if DEBUG
+        if LibraScanDemoMode.isEnabled {
+            wantsConnection = true
+            state = .connected(macName: LibraScanDemoMode.macName)
+        }
+#endif
     }
 
     // MARK: - User actions
 
     func sheetOpened() {
+#if DEBUG
+        if LibraScanDemoMode.isEnabled { return }
+#endif
         isSheetOpen = true
         didLastAttemptFail = false
         updateBrowsing()
     }
 
     func sheetClosed() {
+#if DEBUG
+        if LibraScanDemoMode.isEnabled { return }
+#endif
         isSheetOpen = false
         updateBrowsing()
     }
@@ -190,6 +202,9 @@ final class BridgeClient: NSObject, ObservableObject {
     // MARK: - Scene lifecycle
 
     func sceneDidEnterBackground() {
+#if DEBUG
+        if LibraScanDemoMode.isEnabled { return }
+#endif
         isInBackground = true
         // Multipeer sessions don't survive backgrounding; dropping explicitly
         // is the documented behavior. wantsConnection stays set so we
@@ -203,6 +218,9 @@ final class BridgeClient: NSObject, ObservableObject {
     }
 
     func sceneDidBecomeActive() {
+#if DEBUG
+        if LibraScanDemoMode.isEnabled { return }
+#endif
         isInBackground = false
         updateBrowsing()
     }
@@ -210,6 +228,12 @@ final class BridgeClient: NSObject, ObservableObject {
     // MARK: - Sending scans
 
     func send(_ payload: ScanPayload, scannedAt: Date) {
+#if DEBUG
+        if LibraScanDemoMode.isEnabled {
+            recordDelivery(.typed, for: payload.id)
+            return
+        }
+#endif
         guard wantsConnection else { return }
         let scan = PendingScan(
             payloadID: payload.id,
