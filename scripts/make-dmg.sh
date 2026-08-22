@@ -95,5 +95,18 @@ xcrun notarytool submit "$DMG" \
 xcrun stapler staple "$DMG"
 xcrun stapler validate "$DMG"
 
-# Apple's own pre-flight: the last word on whether this can ship.
-syspolicy_check distribution "$DMG"
+# Apple's own pre-flight. It runs XProtect, which is not always functional on a
+# headless CI runner — Apple's advice for that specific error is "file a Feedback",
+# i.e. the check faulted, not the artifact. Tolerate exactly that one; everything
+# else is a real reason not to ship. The stapler validate above is the hard gate.
+CHECK="$(syspolicy_check distribution "$DMG" 2>&1)" || true
+echo "$CHECK"
+FATALS="$(printf '%s\n' "$CHECK" | grep -c 'Severity: Fatal' || true)"
+XPROTECT="$(printf '%s\n' "$CHECK" | grep -c 'Internal Xprotect Error' || true)"
+if [ "$FATALS" -gt "$XPROTECT" ]; then
+  echo "ERROR: syspolicy_check reported $FATALS fatal issue(s), $XPROTECT of them XProtect-internal." >&2
+  exit 1
+fi
+if [ "$XPROTECT" -gt 0 ]; then
+  echo "NOTE: ignored $XPROTECT XProtect-internal error(s) — a headless-runner fault in the checker." >&2
+fi
