@@ -103,6 +103,8 @@ private func render(
         width: screenshotWidth,
         height: screenshotHeight
     )
+    // CoreGraphics will only draw into a context that has an alpha channel, so
+    // compose here and flatten on the way out — see below.
     guard let bitmap = NSBitmapImageRep(
         bitmapDataPlanes: nil,
         pixelsWide: Int(canvasSize.width),
@@ -155,8 +157,28 @@ private func render(
     (shot.title as NSString).draw(in: titleRect, withAttributes: attributes)
 
     NSGraphicsContext.restoreGraphicsState()
-    guard let png = bitmap.representation(using: .png, properties: [:]) else {
-        throw NSError(domain: "StoreScreenshots", code: 5)
+
+    // App Store Connect rejects a screenshot carrying an alpha channel even when
+    // every pixel is opaque, and no drawable NSBitmapImageRep configuration omits
+    // one. So redraw the finished canvas into a noneSkipLast context, which keeps
+    // the fourth byte but marks it meaningless — the PNG then has no alpha.
+    guard let composed = bitmap.cgImage,
+          let opaque = CGContext(
+              data: nil,
+              width: Int(canvasSize.width),
+              height: Int(canvasSize.height),
+              bitsPerComponent: 8,
+              bytesPerRow: 0,
+              space: CGColorSpaceCreateDeviceRGB(),
+              bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+          )
+    else { throw NSError(domain: "StoreScreenshots", code: 5) }
+    opaque.draw(composed, in: CGRect(origin: .zero, size: canvasSize))
+    guard let flattened = opaque.makeImage() else {
+        throw NSError(domain: "StoreScreenshots", code: 6)
+    }
+    guard let png = NSBitmapImageRep(cgImage: flattened).representation(using: .png, properties: [:]) else {
+        throw NSError(domain: "StoreScreenshots", code: 7)
     }
     try png.write(to: outputURL, options: .atomic)
 }
