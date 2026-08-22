@@ -8,11 +8,11 @@ name: Release macOS
 
 on:
   push:
-    tags: ['v*']
+    tags: ['mac-v*']   # iOS releases use ios-v* and go through Xcode Cloud
   workflow_dispatch:
     inputs:
       version:
-        description: 'Marketing version (e.g. 1.0). Defaults to the tag name without "v".'
+        description: 'Marketing version (e.g. 1.0). Defaults to the tag name without "mac-v".'
         required: false
       deploy_site:
         description: 'Publish the dmg to scan.libra.wiki'
@@ -44,7 +44,7 @@ jobs:
         id: v
         run: |
           VERSION="${{ inputs.version }}"
-          if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#v}"; fi
+          if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#mac-v}"; fi
           case "$VERSION" in
             ''|*[!0-9.]*) echo "::error::could not resolve a numeric version from '${GITHUB_REF_NAME}'"; exit 1 ;;
           esac

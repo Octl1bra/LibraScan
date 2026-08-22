@@ -1,9 +1,9 @@
 # LibraScan 自动发布
 
-| 端 | 平台 | 为什么 |
-| --- | --- | --- |
-| iOS → TestFlight | **Xcode Cloud** | 云签名，一张证书都不用配，密钥为零 |
-| macOS → 公证 dmg → 官网 | **GitHub Actions** | 反正要自带 Developer ID 证书；一套脚本跑完签名、公证、打包、上线 |
+| 端 | 平台 | 为什么 | tag |
+| --- | --- | --- | --- |
+| iOS → TestFlight | **Xcode Cloud** | 云签名，一张证书都不用配，密钥为零 | `ios-v*` |
+| macOS → 公证 dmg → 官网 | **GitHub Actions** | 反正要自带 Developer ID 证书；一套脚本跑完签名、公证、打包、上线 | `mac-v*` |
 
 Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security find-identity` 返回
 **0 个身份**（云签名不经过构建机的钥匙串），所以 dmg 签不了、pkg 也签不了
@@ -18,7 +18,7 @@ Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security fi
 
 1. Xcode 打开工程 → Product → Xcode Cloud → Create Workflow → 选 **LibraScan** scheme。
 2. 授权访问 GitHub 仓库（会装一个 Xcode Cloud 的 GitHub App）。
-3. Start Conditions：`Tag Changes`，模式 `v*`（和 macOS 那边同一个 tag 触发）。
+3. Start Conditions：`Tag Changes`，模式 `ios-v*`。
 4. Actions：**Archive**，Platform **iOS**，Distribution **TestFlight (Internal Testing Only)**。
 5. Post-Actions：**TestFlight Internal Testing** → 选测试组。
 
@@ -106,18 +106,34 @@ syspolicy_check distribution build/release-1.0/LibraScan-1.0.dmg
 
 ## 三、发一个版本
 
-1. 改 `LibraScan.xcodeproj` 里的 `MARKETING_VERSION`（两端共用一处），提交。
+**两端版本独立**：`MARKETING_VERSION` 定义在各自 target 上，各发各的。iOS 有审核延迟，
+Mac 改完就能发，锁步只会让快的等慢的。两者的兼容契约是 `BridgeMessage.currentVersion`，
+与营销版本号无关。
+
+1. 改对应 target 的 `MARKETING_VERSION`，提交。
    构建号不用管：两条流水线都取 `git rev-list --count HEAD`（提交数）。**不用
    `github.run_number` / `CI_BUILD_NUMBER`**——那两个计数器按 workflow 各自从 1 开始，
    首次运行会给出比已发布版本更低的构建号，Mac 端 appcast 会倒退、TestFlight 会以
    重复构建号拒收。两处都设了下限 `BUILD_FLOOR=4`（高于 2026-08-22 已发布的一切），
    浅克隆导致计数异常时直接失败而不是发出坏包。
-2. `git tag v1.1 && git push origin v1.1`
-3. 两条流水线同时开跑：Xcode Cloud 把 iOS 送进 TestFlight，Actions 出公证 dmg 并更新官网。
+2. 打对应前缀的 tag：
+
+   ```bash
+   git tag ios-v1.1 && git push origin ios-v1.1   # → Xcode Cloud → TestFlight
+   git tag mac-v1.1 && git push origin mac-v1.1   # → Actions → 公证 dmg → 官网
+   ```
+
+   两个都打就是两端一起发；只打一个就只发那一端。
+3. 对应的流水线开跑。
 4. App Store 那一步仍然手动：在 App Store Connect 里选构建、填文案、提审。
 
 手动重跑 macOS 那半边：Actions 页面 → Release macOS → Run workflow，填版本号，
 `deploy_site` 可关掉（只出包不动官网）。
+
+**重推 tag 的规矩**：流水线失败而代码没改 → 直接 rerun，别动 tag。加了修复 commit 想
+重发同一个版本号 → 删 tag 重推（构建号取提交数，会自然变大，TestFlight 不会撞号）。
+**已经交付出去的 tag 不要动**：TestFlight 收过的构建号不能复用，官网上的同名 dmg 会被
+悄悄覆盖成不同字节——这种情况打新版本号。
 
 ## 四、公开仓库须知
 

@@ -1,6 +1,9 @@
 #!/bin/sh
 # Xcode Cloud — runs after the clone, before xcodebuild.
 #
+# iOS releases are tagged ios-v* (macOS uses mac-v* and GitHub Actions); set the
+# workflow's Start Condition to that pattern so the two platforms ship apart.
+#
 # Stamps a build number into the project's single project-level
 # CURRENT_PROJECT_VERSION. MARKETING_VERSION stays hand-edited.
 #
