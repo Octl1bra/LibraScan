@@ -38,9 +38,6 @@
     <p>当你使用「键入到 Mac」时，iPhone 通过 Apple 的 MultipeerConnectivity 框架与 Mac 建立点对点连接（点对点 Wi-Fi 或局域网），传输强制加密。扫到的内容只会发送到你在 Mac 上明确「允许」过的那台设备，中间没有任何服务器，我们无法看到内容。</p>
     <p>Mac 端把最近 5 条键入内容保留在内存中供你查看或复制，退出应用即消失；信任过的 iPhone 名称与配对日期保存在 Mac 本地偏好设置中，可在设置里删除。</p>
 
-    <h2>扫描图片文件（仅 Mac 版）</h2>
-    <p>从访达对图片使用 LibraScan 时，文件只在本机读取，交给系统的 Vision 框架识别，不上传、不缓存、不写入任何记录。识别结果只显示在窗口里，或按你的操作放进剪贴板。</p>
-
     <h2>更新检查（仅 Mac 版）</h2>
     <p>Mac 版每天最多一次向 GitHub 的公开接口（<code>api.github.com</code>）查询本项目最新的发布版本，用来判断是否有新版。这是一次普通的 GET 请求，只带一个标明「LibraScan 及其版本号」的 User-Agent：不发送设备标识、系统版本、使用情况或任何其它信息。检查结果只在本机显示，发现新版本时也只是给出下载链接，不会自动下载或安装。GitHub 会像对待任何一次网站访问一样记录 IP 与时间，其隐私政策由 GitHub 自行提供。</p>
     <p>可以在「设置 → 关于 → 自动检查更新」中关闭；关闭后除非你手动点「立即检查」，Mac 版不会发起任何网络请求。iPhone 版没有这项功能。</p>
@@ -92,9 +89,6 @@
     <h2>Local network and the Mac bridge</h2>
     <p>When you use “Type to Mac”, the iPhone connects to your Mac peer-to-peer through Apple's MultipeerConnectivity framework (peer-to-peer Wi-Fi or your local network) with encryption required. Scanned content is sent only to the Mac you explicitly allowed, with no server in between, so we cannot see it.</p>
     <p>The Mac app keeps the last five typed items in memory so you can review or copy them; they are gone when the app quits. Names and pairing dates of trusted iPhones are stored in the Mac's local preferences and can be removed in Settings.</p>
-
-    <h2>Scanning image files (Mac app only)</h2>
-    <p>When you run LibraScan on an image from Finder, the file is read locally and handed to the system's Vision framework. Nothing is uploaded, cached, or written to a history. Results are shown in the window, or placed on the clipboard when you ask for them.</p>
 
     <h2>Update checks (Mac app only)</h2>
     <p>At most once a day, the Mac app asks GitHub's public API (<code>api.github.com</code>) for this project's latest release to see whether a newer version exists. It is an ordinary GET carrying only a User-Agent that names LibraScan and its version: no device identifier, OS version, usage data, or anything else is sent. The result is shown only on your Mac, and a newer version is offered as a download link — nothing is downloaded or installed for you. GitHub logs the IP and timestamp as it would for any visit, under its own privacy policy.</p>
