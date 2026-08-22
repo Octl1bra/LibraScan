@@ -4,7 +4,7 @@
     // Fill in once the app is live on the App Store, e.g. "https://apps.apple.com/app/id0000000000".
     appStoreURL: "",
     macVersion: "1.0",
-    macDownloadURL: "/dl/LibraScan-1.0.dmg?b=3", // new path/query per Mac build: the zone edge-caches by full URL
+    macDownloadURL: "/dl/LibraScan-1.0.dmg?b=4", // new path/query per Mac build: the zone edge-caches by full URL
     macSHA256: "2248be12c450768789bef037acd34b47e88646e81e03aa063958b8c5bc407f05",
     supportEmail: "me@libra.wiki",
   };

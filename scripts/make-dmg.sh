@@ -56,22 +56,44 @@ echo "built $DMG"
 # Apple's servers, so codesign reports "no identity found". Create a second certificate
 # from a CSR instead (Keychain Access → Certificate Assistant), which keeps the private
 # key local. See docs/CI.md.
-if [ -n "${DEVELOPER_ID_IDENTITY:-}" ]; then
-  echo "signing the dmg as: $DEVELOPER_ID_IDENTITY"
-  codesign --force --sign "$DEVELOPER_ID_IDENTITY" --timestamp "$DMG"
-  codesign --verify --verbose=2 "$DMG"
+# Either everything needed to ship is present, or none of it is. A half-configured
+# run used to emit a plausible-looking dmg that Gatekeeper would reject on the
+# user's machine — the worst possible failure, because it looks like success.
+CREDS_SET=0
+for v in "${DEVELOPER_ID_IDENTITY:-}" "${NOTARY_KEY_PATH:-}" "${NOTARY_KEY_ID:-}" "${NOTARY_ISSUER_ID:-}"; do
+  [ -n "$v" ] && CREDS_SET=$((CREDS_SET + 1))
+done
 
-  if [ -n "${NOTARY_KEY_PATH:-}" ] && [ -n "${NOTARY_KEY_ID:-}" ] && [ -n "${NOTARY_ISSUER_ID:-}" ]; then
-    xcrun notarytool submit "$DMG" \
-      --key "$NOTARY_KEY_PATH" --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
-    xcrun stapler staple "$DMG"
-    xcrun stapler validate "$DMG"
-    syspolicy_check distribution "$DMG"
-  else
-    echo "WARNING: dmg signed but NOT notarized (no NOTARY_* credentials)." >&2
-    echo "         Gatekeeper rejects a signed-but-unnotarized dmg on download." >&2
-  fi
-else
-  echo "WARNING: dmg is neither signed nor notarized — Gatekeeper WILL reject it when a user" >&2
-  echo "         downloads it. Set DEVELOPER_ID_IDENTITY and NOTARY_*; see docs/CI.md." >&2
+if [ "$CREDS_SET" -eq 0 ]; then
+  echo >&2
+  echo "WARNING: DEV BUILD — this dmg is neither signed nor notarized." >&2
+  echo "         Gatekeeper WILL reject it when a user downloads it. Fine for checking" >&2
+  echo "         the window layout; never publish it. See docs/CI.md." >&2
+  exit 0
 fi
+
+if [ "$CREDS_SET" -ne 4 ]; then
+  echo >&2
+  echo "ERROR: partial signing configuration — refusing to emit a dmg that cannot ship." >&2
+  for pair in "DEVELOPER_ID_IDENTITY:${DEVELOPER_ID_IDENTITY:-}" "NOTARY_KEY_PATH:${NOTARY_KEY_PATH:-}" \
+              "NOTARY_KEY_ID:${NOTARY_KEY_ID:-}" "NOTARY_ISSUER_ID:${NOTARY_ISSUER_ID:-}"; do
+    name="${pair%%:*}"; value="${pair#*:}"
+    [ -n "$value" ] && echo "         $name: set" >&2 || echo "         $name: MISSING" >&2
+  done
+  rm -f "$DMG"
+  exit 1
+fi
+
+[ -f "$NOTARY_KEY_PATH" ] || { echo "ERROR: NOTARY_KEY_PATH does not exist: $NOTARY_KEY_PATH" >&2; rm -f "$DMG"; exit 1; }
+
+echo "signing the dmg as: $DEVELOPER_ID_IDENTITY"
+codesign --force --sign "$DEVELOPER_ID_IDENTITY" --timestamp "$DMG"
+codesign --verify --verbose=2 "$DMG"
+
+xcrun notarytool submit "$DMG" \
+  --key "$NOTARY_KEY_PATH" --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
+xcrun stapler staple "$DMG"
+xcrun stapler validate "$DMG"
+
+# Apple's own pre-flight: the last word on whether this can ship.
+syspolicy_check distribution "$DMG"

@@ -11,6 +11,7 @@
 #
 # Cache note: the libra.wiki zone edge-caches .dmg/.js/.css for hours and this token cannot purge.
 # When assets or the dmg change, bump the ?v= / ?b= query strings in index.html and app.js.
+# These are opaque, monotonic cache keys — NOT the app's build number (CI uses the run number).
 # After deploying, wait ~30 s before requesting a NEW ?v= URL through scan.libra.wiki: an early request can
 # be served by a PoP still on the previous deployment and the stale copy gets cached under the new key.
 set -eu
