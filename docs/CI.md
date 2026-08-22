@@ -36,9 +36,12 @@ Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security fi
 
 ### 需要的凭据
 
-仓库里只有**一个** GitHub Secret：`OP_SERVICE_ACCOUNT_TOKEN`（已配好，是
-1Password 服务账号 `gh-action-librascan` 的令牌，只读 `gh-action` 保管库）。
-其余全部按名字从 1Password 取：
+仓库里只有**一个** GitHub Secret：`OP_SERVICE_ACCOUNT_TOKEN`——1Password 服务账号
+`librascan-ci` 的令牌，只读 `gh-action` 保管库。其余全部按名字从 1Password 取：
+
+同一个令牌另存于 `op://Agents/gh-action-sa/credential`，这样本地脚本也能**无人值守**
+读到 gh-action：`opsa` 只能读 Agents，先从那里取到令牌，再用它读 gh-action
+（`site/deploy.sh` 就是这么做的）。轮换时两处一起换。
 
 | 保管库条目 | 字段 | 内容 | 状态 |
 | --- | --- | --- | --- |
@@ -47,7 +50,7 @@ Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security fi
 | | `identity` | `Developer ID Application: Jinrui Hu (6NK6HJKB8Z)` | ✅ |
 | | `private_key` / `csr` | 原始私钥与 CSR，续期时可复用 | ✅ |
 | `apple-asc-api-key` | `key_id` / `issuer_id` / `p8` | ASC 团队密钥（Admin），notarytool 用 | ✅ 2026-08-22 建好 |
-| `cloudflare-libra` | `credential` / `account_id` | 个人 Cloudflare token | ⬜ 需从 Agents 保管库复制过来 |
+| `cloudflare-libra` | `credential` / `account_id` | 个人 Cloudflare token | ✅ 2026-08-22 建好 |
 
 证书有效期到 **2031-08-23**；ASC 的 `.p8` 只能下载一次，1Password 里是唯一副本。
 

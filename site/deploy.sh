@@ -20,10 +20,16 @@ cd "$(dirname "$0")"
 # 1Password Agents vault item "cloudflare-libra" (fields: credential, account_id) via opsa.
 OPSA="$HOME/.claude/bin/opsa"
 if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] && [ -x "$OPSA" ]; then
-  CLOUDFLARE_API_TOKEN="$("$OPSA" read 'op://Agents/cloudflare-libra/credential')"
-  CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-$("$OPSA" item get cloudflare-libra --vault Agents --fields label=account_id --reveal)}"
+  # Local runs: opsa can only read the Agents vault, so bootstrap through the
+  # service-account token kept there into gh-action, which holds the real
+  # credential. CI skips this entirely — the workflow has already exported it.
+  OP_SERVICE_ACCOUNT_TOKEN="$("$OPSA" read 'op://Agents/gh-action-sa/credential')"
+  export OP_SERVICE_ACCOUNT_TOKEN
+  CLOUDFLARE_API_TOKEN="$(op read 'op://gh-action/cloudflare-libra/credential')"
+  CLOUDFLARE_ACCOUNT_ID="$(op read 'op://gh-action/cloudflare-libra/account_id')"
   export CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID
 fi
+
 VERSION="${1:-1.0}"
 mkdir -p download dl
 cp "../build/release-$VERSION/LibraScan-$VERSION.dmg" "download/LibraScan-$VERSION.dmg"
