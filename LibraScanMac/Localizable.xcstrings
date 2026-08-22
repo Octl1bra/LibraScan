@@ -131,52 +131,12 @@
         }
       }
     },
-    "Copied" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已复制"
-          }
-        }
-      }
-    },
-    "Copied “%@” to the clipboard." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已复制“%@”到剪贴板。"
-          }
-        }
-      }
-    },
-    "Copy" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "复制"
-          }
-        }
-      }
-    },
     "Couldn't check" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "检查失败"
-          }
-        }
-      }
-    },
-    "Couldn't read this file as an image." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法把这个文件读成图像。"
           }
         }
       }
@@ -271,36 +231,6 @@
         }
       }
     },
-    "No Images Scanned" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "没有扫描任何图片"
-          }
-        }
-      }
-    },
-    "No code found in this image." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这张图里没有找到码。"
-          }
-        }
-      }
-    },
-    "No image files were provided." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "没有提供图片文件。"
-          }
-        }
-      }
-    },
     "No trusted devices yet." : {
       "localizations" : {
         "zh-Hans" : {
@@ -317,16 +247,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "还没有键入过内容。"
-          }
-        }
-      }
-    },
-    "Open" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "打开"
           }
         }
       }
@@ -417,16 +337,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移除"
-          }
-        }
-      }
-    },
-    "Scan Results" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "扫描结果"
           }
         }
       }

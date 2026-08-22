@@ -27,12 +27,6 @@ iPhone (LibraScan)  ──扫码──►  MultipeerConnectivity（加密 P2P，
 
 协议细节见 [docs/MAC_KEY_BRIDGE.md](docs/MAC_KEY_BRIDGE.md) §5。
 
-## 在 Mac 上扫图片里的码
-
-在访达里右键任意图片，选**打开方式 → LibraScan**，或者**服务 → 用 LibraScan 扫描码**。
-识别走 Vision，不需要先预览。只找到一个码时直接进剪贴板，连窗口都不弹；多个文件、
-多个码、或者一个都没有，才会开一个结果面板。
-
 ## 仓库结构
 
 | 路径 | 内容 |
