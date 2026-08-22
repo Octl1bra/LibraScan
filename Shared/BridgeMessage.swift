@@ -11,6 +11,10 @@ import Foundation
 nonisolated struct BridgeMessage: Codable {
     /// Message kinds are plain strings so unknown future kinds decode fine
     /// and can be answered with `unsupported` instead of failing.
+    ///
+    /// An `unsupported` reply echoes the rejected message's `seq` when it had
+    /// one, so the sender can settle that exact scan rather than leaving it in
+    /// flight. Older builds simply ignore the extra field.
     enum Kind {
         static let scan = "scan"
         static let ack = "ack"

@@ -8,6 +8,7 @@ import SwiftUI
 
 struct MenuContentView: View {
     @ObservedObject var server: BridgeServer
+    @ObservedObject var updates: UpdateChecker
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
@@ -16,6 +17,14 @@ struct MenuContentView: View {
 
             if !server.isAccessibilityTrusted {
                 permissionWarning
+            }
+
+            if let incompatibility = server.incompatibility {
+                incompatibilityWarning(incompatibility)
+            }
+
+            if case .available(let version, _) = updates.status {
+                updateAvailableRow(version)
             }
 
             Toggle("Pause typing", isOn: $server.isPaused)
@@ -46,6 +55,7 @@ struct MenuContentView: View {
         .frame(width: 300)
         .onAppear {
             server.refreshAccessibility()
+            updates.checkIfDue()
         }
     }
 
@@ -85,6 +95,46 @@ struct MenuContentView: View {
                 }
             }
             .controlSize(.small)
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func updateAvailableRow(_ version: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "arrow.down.circle.fill")
+                .foregroundStyle(.tint)
+            Text("Version \(version) is available.")
+                .font(.caption)
+            Spacer()
+            Button("Get") { updates.openDownloadPage() }
+                .controlSize(.small)
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    /// Mirrors the iPhone's warning: the link is up but nothing can be typed
+    /// until whichever side is behind gets updated.
+    private func incompatibilityWarning(_ incompatibility: PeerIncompatibility) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label {
+                switch incompatibility {
+                case .appIsOlder:
+                    Text("This app is too old to understand the iPhone.")
+                case .peerIsOlder:
+                    Text("LibraScan on the iPhone is too old to understand this Mac.")
+                }
+            } icon: {
+                Image(systemName: "exclamationmark.triangle.fill")
+            }
+            .font(.caption)
+            .foregroundStyle(.orange)
+            Text("Scans can't be typed until both sides are updated.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
         .padding(8)
         .frame(maxWidth: .infinity, alignment: .leading)

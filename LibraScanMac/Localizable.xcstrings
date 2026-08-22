@@ -1,6 +1,26 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld ms" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 毫秒"
+          }
+        }
+      }
+    },
+    "About" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于"
+          }
+        }
+      }
+    },
     "Accessibility permission is required to type." : {
       "localizations" : {
         "zh-Hans" : {
@@ -51,6 +71,26 @@
         }
       }
     },
+    "Check Now" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "立即检查"
+          }
+        }
+      }
+    },
+    "Check for updates automatically" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动检查更新"
+          }
+        }
+      }
+    },
     "Click to copy" : {
       "localizations" : {
         "zh-Hans" : {
@@ -77,6 +117,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已连接 %@"
+          }
+        }
+      }
+    },
+    "Couldn't check" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查失败"
           }
         }
       }
@@ -111,6 +161,26 @@
         }
       }
     },
+    "Get" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "获取"
+          }
+        }
+      }
+    },
+    "Get %@" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "获取 %@"
+          }
+        }
+      }
+    },
     "Grant Permission…" : {
       "localizations" : {
         "zh-Hans" : {
@@ -131,12 +201,12 @@
         }
       }
     },
-    "Nothing typed yet." : {
+    "LibraScan on the iPhone is too old to understand this Mac." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "还没有键入过内容。"
+            "value" : "iPhone 上的 LibraScan 版本过旧，无法与这台 Mac 通信。"
           }
         }
       }
@@ -147,6 +217,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "还没有信任的设备。"
+          }
+        }
+      }
+    },
+    "Nothing typed yet." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有键入过内容。"
           }
         }
       }
@@ -211,12 +291,32 @@
         }
       }
     },
+    "Scans can't be typed until both sides are updated." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在两端都更新之前，扫码内容无法键入。"
+          }
+        }
+      }
+    },
     "Settings…" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "设置…"
+          }
+        }
+      }
+    },
+    "This app is too old to understand the iPhone." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这台 Mac 上的 LibraScan 版本过旧，无法与 iPhone 通信。"
           }
         }
       }
@@ -231,22 +331,42 @@
         }
       }
     },
+    "Up to date" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已是最新"
+          }
+        }
+      }
+    },
+    "Version" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本"
+          }
+        }
+      }
+    },
+    "Version %@ is available." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有新版本 %@。"
+          }
+        }
+      }
+    },
     "Waiting for iPhone…" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "等待 iPhone 连接…"
-          }
-        }
-      }
-    },
-    "%lld ms" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 毫秒"
           }
         }
       }

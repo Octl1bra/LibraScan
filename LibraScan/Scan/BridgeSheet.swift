@@ -17,6 +17,10 @@ struct BridgeSheet: View {
     var body: some View {
         NavigationStack {
             Form {
+                if let incompatibility = bridge.incompatibility {
+                    incompatibilitySection(incompatibility)
+                }
+
                 switch bridge.state {
                 case .connected(let macName):
                     connectedSection(macName: macName)
@@ -47,6 +51,29 @@ struct BridgeSheet: View {
         .presentationDetents([.medium, .large])
         .onAppear { bridge.sheetOpened() }
         .onDisappear { bridge.sheetClosed() }
+    }
+
+    /// A protocol-version mismatch keeps the link up but makes every scan fail,
+    /// so say which side is behind rather than repeating "failed" per scan.
+    private func incompatibilitySection(_ incompatibility: BridgeIncompatibility) -> some View {
+        Section {
+            Label {
+                switch incompatibility {
+                case .macIsOlder:
+                    Text("LibraScan on the Mac is too old to understand this iPhone.")
+                case .appIsOlder:
+                    Text("This app is too old to understand LibraScan on the Mac.")
+                }
+            } icon: {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+            }
+            if incompatibility == .macIsOlder {
+                Link("Download the latest Mac app", destination: URL(string: "https://scan.libra.wiki")!)
+            }
+        } footer: {
+            Text("Scans can't be typed until both sides are updated.")
+        }
     }
 
     private func connectedSection(macName: String) -> some View {

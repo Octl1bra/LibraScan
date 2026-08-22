@@ -15,6 +15,15 @@ struct TypedItem: Identifiable {
     let date: Date
 }
 
+/// Why this app and the iPhone cannot understand each other. See
+/// `BridgeIncompatibility` on the iOS side — same idea, mirrored.
+enum PeerIncompatibility: Equatable {
+    /// The iPhone rejected something we sent: it speaks an older protocol.
+    case peerIsOlder
+    /// We rejected something the iPhone sent: this app is the older one.
+    case appIsOlder
+}
+
 struct TrustedPeer: Identifiable {
     var id: String { name }
     let name: String
@@ -38,6 +47,8 @@ final class BridgeServer: NSObject, ObservableObject {
     @Published private(set) var connectedPeerName: String?
     @Published private(set) var recentItems: [TypedItem] = []
     @Published private(set) var trustedPeers: [TrustedPeer] = []
+    /// Set when a protocol-version mismatch surfaces; cleared per connection.
+    @Published private(set) var incompatibility: PeerIncompatibility?
     @Published private(set) var isAccessibilityTrusted = AXIsProcessTrusted()
     @Published var isPaused = false {
         didSet { typingEngine.setPaused(isPaused) }
@@ -97,6 +108,7 @@ final class BridgeServer: NSObject, ObservableObject {
 
     private func tearDownSession() {
         connectedPeerName = nil
+        incompatibility = nil
         session = nil
         handledSeqs.removeAll()
         handledOrder.removeAll()
@@ -226,7 +238,10 @@ final class BridgeServer: NSObject, ObservableObject {
         missedPongs = 0
 
         guard message.v <= BridgeMessage.currentVersion else {
-            send(BridgeMessage(type: BridgeMessage.Kind.unsupported))
+            // The iPhone speaks a newer protocol than this build understands.
+            // Echo the seq so it can settle that scan instead of waiting forever.
+            incompatibility = .appIsOlder
+            send(BridgeMessage(type: BridgeMessage.Kind.unsupported, seq: message.seq))
             return
         }
 
@@ -235,10 +250,13 @@ final class BridgeServer: NSObject, ObservableObject {
             handleScan(message)
         case BridgeMessage.Kind.ping:
             send(BridgeMessage(type: BridgeMessage.Kind.pong))
-        case BridgeMessage.Kind.ack, BridgeMessage.Kind.pong, BridgeMessage.Kind.unsupported:
+        case BridgeMessage.Kind.unsupported:
+            // The iPhone could not understand something we sent.
+            incompatibility = .peerIsOlder
+        case BridgeMessage.Kind.ack, BridgeMessage.Kind.pong:
             break
         default:
-            send(BridgeMessage(type: BridgeMessage.Kind.unsupported))
+            send(BridgeMessage(type: BridgeMessage.Kind.unsupported, seq: message.seq))
         }
     }
 

@@ -22,6 +22,19 @@ enum BridgeDelivery: Equatable {
     case failed(reason: String?)
 }
 
+/// Why the bridge and the Mac cannot understand each other.
+///
+/// The wire protocol is versioned independently of either app's marketing
+/// version (`BridgeMessage.currentVersion`), so the two apps ship on their own
+/// schedules. This is what the user sees once they drift far enough apart for
+/// the protocol to have moved.
+enum BridgeIncompatibility: Equatable {
+    /// The Mac rejected something this app sent: it speaks an older protocol.
+    case macIsOlder
+    /// This app rejected something the Mac sent: this app is the older one.
+    case appIsOlder
+}
+
 enum BridgeState: Equatable {
     case off
     case browsing
@@ -52,6 +65,8 @@ final class BridgeClient: NSObject, ObservableObject {
     @Published private(set) var didBrowseFail = false
     /// payloadID -> delivery, pruned in insertion order.
     @Published private(set) var deliveries: [UUID: BridgeDelivery] = [:]
+    /// Set when a protocol-version mismatch surfaces; cleared per connection.
+    @Published private(set) var incompatibility: BridgeIncompatibility?
     @Published var resendOnReconnect: Bool {
         didSet { UserDefaults.standard.set(resendOnReconnect, forKey: Self.resendKey) }
     }
@@ -64,6 +79,9 @@ final class BridgeClient: NSObject, ObservableObject {
     var lastMacName: String? {
         UserDefaults.standard.string(forKey: Self.lastMacKey)
     }
+
+    /// `BridgeDelivery.failed` reason for a scan the Mac could not understand.
+    static let versionMismatchReason = "version-mismatch"
 
     private static let resendKey = "bridgeResendOnReconnect"
     private static let lastMacKey = "bridgeLastMacName"
@@ -323,6 +341,7 @@ final class BridgeClient: NSObject, ObservableObject {
 
     private func handleConnected(to peerName: String) {
         didLastAttemptFail = false
+        incompatibility = nil
         state = .connected(macName: peerName)
         startHeartbeat()
         updateBrowsing()
@@ -344,6 +363,7 @@ final class BridgeClient: NSObject, ObservableObject {
         }
 
         session = nil
+        incompatibility = nil
         stopHeartbeat()
         // Sent-but-unacked scans are NOT requeued: the Mac's seq dedup resets
         // per connection, so resending could double-type into a document. The
@@ -391,7 +411,9 @@ final class BridgeClient: NSObject, ObservableObject {
         missedPongs = 0
 
         guard message.v <= BridgeMessage.currentVersion else {
-            sendControl(BridgeMessage(type: BridgeMessage.Kind.unsupported))
+            // The Mac speaks a newer protocol than this build understands.
+            incompatibility = .appIsOlder
+            sendControl(BridgeMessage(type: BridgeMessage.Kind.unsupported, seq: message.seq))
             return
         }
 
@@ -400,11 +422,29 @@ final class BridgeClient: NSObject, ObservableObject {
             handleAck(message)
         case BridgeMessage.Kind.ping:
             sendControl(BridgeMessage(type: BridgeMessage.Kind.pong))
-        case BridgeMessage.Kind.pong, BridgeMessage.Kind.unsupported:
+        case BridgeMessage.Kind.unsupported:
+            handleUnsupported(message)
+        case BridgeMessage.Kind.pong:
             break
         default:
-            sendControl(BridgeMessage(type: BridgeMessage.Kind.unsupported))
+            sendControl(BridgeMessage(type: BridgeMessage.Kind.unsupported, seq: message.seq))
         }
+    }
+
+    /// The Mac could not understand something we sent, so it is running an
+    /// older protocol than this build speaks. Settle the scan it names — or
+    /// everything in flight, if the reply didn't say which — instead of
+    /// leaving the banner spinning at "sending" until the link drops.
+    private func handleUnsupported(_ message: BridgeMessage) {
+        incompatibility = .macIsOlder
+        if let seq = message.seq, let payloadID = inFlight.removeValue(forKey: seq) {
+            recordDelivery(.failed(reason: Self.versionMismatchReason), for: payloadID)
+            return
+        }
+        for payloadID in inFlight.values {
+            recordDelivery(.failed(reason: Self.versionMismatchReason), for: payloadID)
+        }
+        inFlight.removeAll()
     }
 
     private func handleAck(_ message: BridgeMessage) {

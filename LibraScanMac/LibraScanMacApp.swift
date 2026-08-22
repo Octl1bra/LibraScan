@@ -10,17 +10,19 @@ import SwiftUI
 struct LibraScanMacApp: App {
     @NSApplicationDelegateAdaptor(ReopenDelegate.self) private var reopenDelegate
     @StateObject private var server = BridgeServer()
+    @StateObject private var updates = UpdateChecker()
 
     var body: some Scene {
         MenuBarExtra {
-            MenuContentView(server: server)
+            MenuContentView(server: server, updates: updates)
         } label: {
             StatusIconLabel(server: server)
+                .task { updates.checkIfDue() }
         }
         .menuBarExtraStyle(.window)
 
         Settings {
-            SettingsView(server: server)
+            SettingsView(server: server, updates: updates)
         }
     }
 }

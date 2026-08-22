@@ -95,6 +95,7 @@ private struct BridgeDeliveryBadge: View {
             switch reason {
             case "no-permission": "Mac not authorized to type"
             case "paused": "Typing paused on Mac"
+            case BridgeClient.versionMismatchReason: "Mac app is out of date"
             default: "Failed to type on Mac"
             }
         }

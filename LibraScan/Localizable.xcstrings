@@ -161,6 +161,16 @@
         }
       }
     },
+    "Download the latest Mac app" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载最新的 Mac 版"
+          }
+        }
+      }
+    },
     "Export Records" : {
       "localizations" : {
         "zh-Hans" : {
@@ -201,6 +211,16 @@
         }
       }
     },
+    "LibraScan on the Mac is too old to understand this iPhone." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac 上的 LibraScan 版本过旧，无法与这台 iPhone 通信。"
+          }
+        }
+      }
+    },
     "LibraScan uses the camera to scan QR codes and barcodes. The camera feed is never saved or uploaded." : {
       "localizations" : {
         "zh-Hans" : {
@@ -217,6 +237,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在查找附近的 Mac…"
+          }
+        }
+      }
+    },
+    "Mac app is out of date" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac 端版本过旧"
           }
         }
       }
@@ -361,6 +391,16 @@
         }
       }
     },
+    "Scans can't be typed until both sides are updated." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在两端都更新之前，扫码内容无法键入。"
+          }
+        }
+      }
+    },
     "Search records" : {
       "localizations" : {
         "zh-Hans" : {
@@ -387,6 +427,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分享"
+          }
+        }
+      }
+    },
+    "This app is too old to understand LibraScan on the Mac." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这台 iPhone 上的 LibraScan 版本过旧，无法与 Mac 通信。"
           }
         }
       }
