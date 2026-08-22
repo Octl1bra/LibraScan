@@ -68,4 +68,4 @@ xcodebuild -project LibraScan.xcodeproj -scheme LibraScanMac build
 
 ## Privacy
 
-Everything stays on your devices and your own network. Scan history lives on the iPhone; typed content exists only in the Mac's memory, five items deep, and is gone when the app quits. There is no server, no analytics, and no account. The only network request either app ever makes is the Mac app's daily version check against `scan.libra.wiki`, which sends nothing about you and can be turned off in Settings.
+Everything stays on your devices and your own network. Scan history lives on the iPhone; typed content exists only in the Mac's memory, five items deep, and is gone when the app quits. There is no server, no analytics, and no account. The only network request either app ever makes is the Mac app asking GitHub, at most once a day, whether a newer release exists — it sends nothing about you and can be turned off in Settings.
