@@ -5,12 +5,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DERIVED_DATA="$PROJECT_DIR/build/DerivedData-store"
 RAW_DIR="$PROJECT_DIR/build/store/raw"
-SIMULATOR_NAME="${LIBRASCAN_SIMULATOR_NAME:-iPhone 17 Pro Max}"
+SIMULATOR_NAME="${LIBRASCAN_SIMULATOR_NAME:-iPhone 17}"
 BUNDLE_ID="com.Libra.Scan"
 
 mkdir -p "$RAW_DIR"
 
-UDID="$(xcrun simctl list devices available | awk -F '[()]' -v name="$SIMULATOR_NAME" '$0 ~ name { print $2; exit }')"
+UDID="$(xcrun simctl list devices available | awk -F '[()]' -v name="$SIMULATOR_NAME" '$0 ~ "^[[:space:]]*" name "[[:space:]]*\\(" { print $2; exit }')"
 if [[ -z "$UDID" ]]; then
   echo "No available simulator named '$SIMULATOR_NAME'." >&2
   exit 1

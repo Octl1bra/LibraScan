@@ -3,8 +3,10 @@ import AppKit
 import Foundation
 
 private let canvasSize = NSSize(width: 1320, height: 2868)
-private let screenshotRect = NSRect(x: 140, y: -110, width: 1040, height: 2260)
-private let cornerRadius: CGFloat = 60
+private let screenshotWidth: CGFloat = 1160
+private let screenshotTop: CGFloat = 2350
+private let cornerRadius: CGFloat = 64
+private let titleFont = NSFont.systemFont(ofSize: 70, weight: .semibold)
 
 private struct StoreShot {
     let inputName: String
@@ -46,17 +48,6 @@ private func color(hex: String) throws -> NSColor {
     )
 }
 
-private func fittedTitleFont(for title: String, maxWidth: CGFloat) -> NSFont {
-    var size: CGFloat = 82
-    while size > 60 {
-        let font = NSFont.systemFont(ofSize: size, weight: .semibold)
-        let width = (title as NSString).size(withAttributes: [.font: font]).width
-        if width <= maxWidth { return font }
-        size -= 1
-    }
-    return NSFont.systemFont(ofSize: 60, weight: .semibold)
-}
-
 private func render(
     shot: StoreShot,
     sourceURL: URL,
@@ -69,6 +60,13 @@ private func render(
             NSLocalizedDescriptionKey: "Cannot read \(sourceURL.path)",
         ])
     }
+    let screenshotHeight = screenshotWidth * source.size.height / source.size.width
+    let screenshotRect = NSRect(
+        x: (canvasSize.width - screenshotWidth) / 2,
+        y: screenshotTop - screenshotHeight,
+        width: screenshotWidth,
+        height: screenshotHeight
+    )
     guard let bitmap = NSBitmapImageRep(
         bitmapDataPlanes: nil,
         pixelsWide: Int(canvasSize.width),
@@ -94,9 +92,9 @@ private func render(
     // Cast one restrained shadow from the same rounded silhouette used to clip.
     let screenshotPath = NSBezierPath(roundedRect: screenshotRect, xRadius: cornerRadius, yRadius: cornerRadius)
     let shadow = NSShadow()
-    shadow.shadowColor = NSColor.black.withAlphaComponent(0.09)
-    shadow.shadowBlurRadius = 34
-    shadow.shadowOffset = NSSize(width: 0, height: -12)
+    shadow.shadowColor = NSColor.black.withAlphaComponent(0.065)
+    shadow.shadowBlurRadius = 28
+    shadow.shadowOffset = NSSize(width: 0, height: -8)
     shadow.set()
     NSColor.white.setFill()
     screenshotPath.fill()
@@ -113,14 +111,13 @@ private func render(
     let paragraph = NSMutableParagraphStyle()
     paragraph.alignment = .center
     paragraph.lineBreakMode = .byClipping
-    let font = fittedTitleFont(for: shot.title, maxWidth: 1110)
     let attributes: [NSAttributedString.Key: Any] = [
-        .font: font,
+        .font: titleFont,
         .foregroundColor: ink,
         .paragraphStyle: paragraph,
     ]
     (shot.title as NSString).draw(
-        in: NSRect(x: 105, y: 2390, width: 1110, height: 120),
+        in: NSRect(x: 80, y: 2500, width: 1160, height: 110),
         withAttributes: attributes
     )
 
