@@ -8,7 +8,7 @@ RAW_DIR="$PROJECT_DIR/build/store/raw"
 SIMULATOR_NAME="${LIBRASCAN_SIMULATOR_NAME:-iPhone 17}"
 BUNDLE_ID="com.Libra.Scan"
 
-mkdir -p "$RAW_DIR"
+mkdir -p "$RAW_DIR/zh-Hans" "$RAW_DIR/en-US"
 
 UDID="$(xcrun simctl list devices available | awk -F '[()]' -v name="$SIMULATOR_NAME" '$0 ~ "^[[:space:]]*" name "[[:space:]]*\\(" { print $2; exit }')"
 if [[ -z "$UDID" ]]; then
@@ -44,12 +44,15 @@ xcrun swift -module-cache-path "$DERIVED_DATA/SwiftModuleCache" \
 xcrun simctl install "$UDID" "$APP_PATH"
 
 capture() {
-  local scene="$1"
-  local output="$2"
+  local language="$1"
+  local locale="$2"
+  local directory="$3"
+  local scene="$4"
+  local output="$5"
   xcrun simctl terminate "$UDID" "$BUNDLE_ID" 2>/dev/null || true
   xcrun simctl launch "$UDID" "$BUNDLE_ID" \
-    -AppleLanguages "(zh-Hans)" \
-    -AppleLocale "zh_CN" \
+    -AppleLanguages "($language)" \
+    -AppleLocale "$locale" \
     -LibraScanDemoMode \
     -LibraScanDemoScreen "$scene"
   sleep 2
@@ -59,11 +62,16 @@ capture() {
     --batteryLevel 100 \
     --cellularBars 4 \
     --wifiBars 3
-  xcrun simctl io "$UDID" screenshot --type=png "$RAW_DIR/$output"
+  xcrun simctl io "$UDID" screenshot --type=png "$RAW_DIR/$directory/$output"
 }
 
-capture scan 01-scan.png
-capture history 02-history.png
-capture bridge 03-type-to-mac.png
+capture zh-Hans zh_CN zh-Hans scan 01-scan.png
+capture zh-Hans zh_CN zh-Hans history 02-history.png
+capture zh-Hans zh_CN zh-Hans bridge 03-type-to-mac.png
 
-"$SCRIPT_DIR/make-store-screenshots.swift"
+capture en en_US en-US scan 01-scan.png
+capture en en_US en-US history 02-history.png
+capture en en_US en-US bridge 03-type-to-mac.png
+
+xcrun swift -module-cache-path "$DERIVED_DATA/SwiftModuleCache" \
+  "$SCRIPT_DIR/make-store-screenshots.swift"

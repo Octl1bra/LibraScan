@@ -23,7 +23,11 @@ enum LibraScanDemoMode {
         return Screen(rawValue: arguments[keyIndex + 1]) ?? .scan
     }()
 
-    static let macName = "Libra 的 MacBook Pro"
+    static var macName: String {
+        Locale.preferredLanguages.first?.hasPrefix("zh") == true
+            ? "Libra 的 MacBook Pro"
+            : "Libra’s MacBook Pro"
+    }
     static let scanPayload = ScanPayload(
         content: "https://scan.libra.wiki",
         symbology: "QR Code"

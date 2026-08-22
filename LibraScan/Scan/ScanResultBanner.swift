@@ -89,7 +89,7 @@ private struct BridgeDeliveryBadge: View {
     var body: some View {
 #if DEBUG
         if LibraScanDemoMode.isEnabled, delivery == .typed {
-            Text(verbatim: "已键入 Mac ✓")
+            Text(verbatim: "\(String(localized: "Typed on Mac")) ✓")
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(.green)
                 .lineLimit(1)

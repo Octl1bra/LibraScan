@@ -6,7 +6,7 @@ private let canvasSize = NSSize(width: 1320, height: 2868)
 private let screenshotWidth: CGFloat = 1160
 private let screenshotTop: CGFloat = 2350
 private let cornerRadius: CGFloat = 64
-private let titleFont = NSFont.systemFont(ofSize: 70, weight: .semibold)
+private let titleFont = NSFont.systemFont(ofSize: 82, weight: .semibold)
 
 private struct StoreShot {
     let inputName: String
@@ -14,10 +14,22 @@ private struct StoreShot {
     let title: String
 }
 
-private let shots = [
-    StoreShot(inputName: "01-scan.png", outputName: "01-scan.png", title: "iPhone 扫码，Mac 上键入"),
-    StoreShot(inputName: "02-history.png", outputName: "02-history.png", title: "扫过的都在，可搜索、可导出"),
-    StoreShot(inputName: "03-type-to-mac.png", outputName: "03-type-to-mac.png", title: "点对点直连，不经服务器"),
+private struct StoreLocale {
+    let directory: String
+    let shots: [StoreShot]
+}
+
+private let locales = [
+    StoreLocale(directory: "zh-Hans", shots: [
+        StoreShot(inputName: "01-scan.png", outputName: "01-scan.png", title: "iPhone 扫码，Mac 上键入"),
+        StoreShot(inputName: "02-history.png", outputName: "02-history.png", title: "扫过的都在，可搜索、可导出"),
+        StoreShot(inputName: "03-type-to-mac.png", outputName: "03-type-to-mac.png", title: "点对点直连，不经服务器"),
+    ]),
+    StoreLocale(directory: "en-US", shots: [
+        StoreShot(inputName: "01-scan.png", outputName: "01-scan.png", title: "Scan on iPhone. Type on Mac."),
+        StoreShot(inputName: "02-history.png", outputName: "02-history.png", title: "Search and export every scan"),
+        StoreShot(inputName: "03-type-to-mac.png", outputName: "03-type-to-mac.png", title: "Peer to peer. No servers."),
+    ]),
 ]
 
 private func value(of variable: String, in css: String) throws -> String {
@@ -117,7 +129,7 @@ private func render(
         .paragraphStyle: paragraph,
     ]
     (shot.title as NSString).draw(
-        in: NSRect(x: 80, y: 2500, width: 1160, height: 110),
+        in: NSRect(x: 80, y: 2488, width: 1160, height: 130),
         withAttributes: attributes
     )
 
@@ -131,8 +143,8 @@ private func render(
 let scriptURL = URL(fileURLWithPath: CommandLine.arguments[0]).standardizedFileURL
 let projectURL = scriptURL.deletingLastPathComponent().deletingLastPathComponent()
 let cssURL = projectURL.appendingPathComponent("site/assets/style.css")
-let rawURL = projectURL.appendingPathComponent("build/store/raw", isDirectory: true)
-let outputURL = projectURL.appendingPathComponent("build/store", isDirectory: true)
+let rawRootURL = projectURL.appendingPathComponent("build/store/raw", isDirectory: true)
+let outputRootURL = projectURL.appendingPathComponent("build/store", isDirectory: true)
 
 do {
     let css = try String(contentsOf: cssURL, encoding: .utf8)
@@ -145,16 +157,29 @@ do {
     let ink = try color(hex: inkHex)
     _ = try color(hex: mutedHex)
 
-    try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
-    for shot in shots {
-        try render(
-            shot: shot,
-            sourceURL: rawURL.appendingPathComponent(shot.inputName),
-            outputURL: outputURL.appendingPathComponent(shot.outputName),
-            paper: paper,
-            ink: ink
-        )
-        print("Wrote build/store/\(shot.outputName) [\(paperHex), \(inkHex), \(mutedHex)]")
+    for locale in locales {
+        let rawURL = rawRootURL.appendingPathComponent(locale.directory, isDirectory: true)
+        let outputURL = outputRootURL.appendingPathComponent(locale.directory, isDirectory: true)
+        try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
+
+        for shot in locale.shots {
+            let localizedOutputURL = outputURL.appendingPathComponent(shot.outputName)
+            try render(
+                shot: shot,
+                sourceURL: rawURL.appendingPathComponent(shot.inputName),
+                outputURL: localizedOutputURL,
+                paper: paper,
+                ink: ink
+            )
+            // Keep the original delivery paths as Chinese compatibility copies.
+            if locale.directory == "zh-Hans" {
+                try Data(contentsOf: localizedOutputURL).write(
+                    to: outputRootURL.appendingPathComponent(shot.outputName),
+                    options: .atomic
+                )
+            }
+            print("Wrote build/store/\(locale.directory)/\(shot.outputName) [\(paperHex), \(inkHex), \(mutedHex)]")
+        }
     }
 } catch {
     fputs("make-store-screenshots: \(error.localizedDescription)\n", stderr)
