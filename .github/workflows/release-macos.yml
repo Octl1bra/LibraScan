@@ -22,6 +22,11 @@ on:
 permissions:
   contents: read
 
+env:
+  # Everything already published is at or below build 3 (dmg + TestFlight, 2026-08-22).
+  # A computed build number must clear this, or something is wrong with the clone.
+  BUILD_FLOOR: 4
+
 concurrency:
   group: release-macos
   cancel-in-progress: false
@@ -32,6 +37,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0          # the build number is the commit count
 
       - name: Resolve version and build number
         id: v
@@ -41,9 +48,21 @@ jobs:
           case "$VERSION" in
             ''|*[!0-9.]*) echo "::error::could not resolve a numeric version from '${GITHUB_REF_NAME}'"; exit 1 ;;
           esac
-          echo "version=$VERSION"          >> "$GITHUB_OUTPUT"
-          echo "build=${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
-          echo "Releasing $VERSION (${GITHUB_RUN_NUMBER})"
+
+          # NOT github.run_number: that counter is per-workflow and starts at 1,
+          # so this workflow's first run would emit a build number below what is
+          # already shipped — the appcast would advertise an older build than
+          # users have, and TestFlight would reject a duplicate. The commit count
+          # is monotonic and is the number the iOS pipeline uses too.
+          BUILD="$(git rev-list --count HEAD)"
+          if [ "$BUILD" -lt "$BUILD_FLOOR" ]; then
+            echo "::error::build number $BUILD is below the floor $BUILD_FLOOR — shallow clone?"
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD"     >> "$GITHUB_OUTPUT"
+          echo "Releasing $VERSION ($BUILD)"
 
       # Every credential lives in 1Password; the repo holds exactly one secret,
       # the read-only service-account token for the gh-action vault.

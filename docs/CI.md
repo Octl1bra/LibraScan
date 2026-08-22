@@ -107,6 +107,11 @@ syspolicy_check distribution build/release-1.0/LibraScan-1.0.dmg
 ## 三、发一个版本
 
 1. 改 `LibraScan.xcodeproj` 里的 `MARKETING_VERSION`（两端共用一处），提交。
+   构建号不用管：两条流水线都取 `git rev-list --count HEAD`（提交数）。**不用
+   `github.run_number` / `CI_BUILD_NUMBER`**——那两个计数器按 workflow 各自从 1 开始，
+   首次运行会给出比已发布版本更低的构建号，Mac 端 appcast 会倒退、TestFlight 会以
+   重复构建号拒收。两处都设了下限 `BUILD_FLOOR=4`（高于 2026-08-22 已发布的一切），
+   浅克隆导致计数异常时直接失败而不是发出坏包。
 2. `git tag v1.1 && git push origin v1.1`
 3. 两条流水线同时开跑：Xcode Cloud 把 iOS 送进 TestFlight，Actions 出公证 dmg 并更新官网。
 4. App Store 那一步仍然手动：在 App Store Connect 里选构建、填文案、提审。
