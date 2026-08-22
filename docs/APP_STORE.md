@@ -109,7 +109,7 @@ PERMISSIONS: Camera (frames are processed on device, never stored or uploaded) a
 
 TESTING WITHOUT A MAC: Scanning, history, search and TXT export are fully functional on their own. Opening “Type to Mac” with no Mac nearby shows an empty list with a hint — expected behaviour, not a bug.
 
-TESTING TYPE TO MAC (optional): Install the free, Developer ID–signed and notarized Mac app from https://scan.libra.wiki/dl/LibraScan.dmg on macOS 15 or later, grant Accessibility when prompted, and keep Wi-Fi and Bluetooth on for both devices. On the iPhone, tap the keyboard icon, choose the Mac, and click Allow on the Mac. Put the cursor in TextEdit and scan any code; the text is typed at the cursor.
+TESTING TYPE TO MAC (optional): Install the free, Developer ID–signed and notarized Mac app from https://github.com/Octl1bra/LibraScan/releases/latest/download/LibraScan.dmg on macOS 15 or later, grant Accessibility when prompted, and keep Wi-Fi and Bluetooth on for both devices. On the iPhone, tap the keyboard icon, choose the Mac, and click Allow on the Mac. Put the cursor in TextEdit and scan any code; the text is typed at the cursor.
 
 REGIONS: The app functions identically in all regions; there are no regional differences in features or content.
 

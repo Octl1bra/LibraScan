@@ -4,7 +4,9 @@
     // Fill in once the app is live on the App Store, e.g. "https://apps.apple.com/app/id0000000000".
     appStoreURL: "",
     macVersion: "1.0",
-    macDownloadURL: "/dl/LibraScan.dmg?b=45", // permanent path; ?b= only busts the edge cache
+    // GitHub resolves this to whichever release is newest, so shipping a version
+    // never touches the site. Nothing here needs revising for 1.1.
+    macDownloadURL: "https://github.com/Octl1bra/LibraScan/releases/latest/download/LibraScan.dmg",
     macSHA256: "2248be12c450768789bef037acd34b47e88646e81e03aa063958b8c5bc407f05",
     supportEmail: "me@libra.wiki",
   };

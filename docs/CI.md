@@ -3,7 +3,7 @@
 | 端 | 平台 | 为什么 | tag |
 | --- | --- | --- | --- |
 | iOS → TestFlight | **Xcode Cloud** | 云签名，一张证书都不用配，密钥为零 | `ios-v*` |
-| macOS → 公证 dmg → 官网 | **GitHub Actions** | 反正要自带 Developer ID 证书；一套脚本跑完签名、公证、打包、上线 | `mac-v*` |
+| macOS → 公证 dmg → GitHub Release | **GitHub Actions** | 反正要自带 Developer ID 证书；一套脚本跑完签名、公证、打包、发布 | `mac-v*` |
 
 Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security find-identity` 返回
 **0 个身份**（云签名不经过构建机的钥匙串），所以 dmg 签不了、pkg 也签不了
@@ -28,8 +28,15 @@ Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security fi
 ## 二、macOS：GitHub Actions
 
 [`.github/workflows/release-macos.yml`](../.github/workflows/release-macos.yml)：
-打 `v*` tag 或手动触发 → 归档 → Developer ID 签名 → 公证 → staple →
-打 dmg（dmg 本身也签名、公证、staple）→ 上传 artifact → 发布到 scan.libra.wiki。
+打 `mac-v*` tag 或手动触发 → 归档 → Developer ID 签名 → 公证 → staple →
+打 dmg（dmg 本身也签名、公证、staple）→ 上传 artifact → **创建 GitHub Release**。
+
+**官网不参与发版**。资产名不带版本号，所以
+`github.com/Octl1bra/LibraScan/releases/latest/download/LibraScan.dmg`
+是一个永久地址，GitHub 自己解析到最新的那个 release；官网、Mac 端的更新检查、
+以及任何对外公布的链接都指向它，发版时一个字都不用改。站点内容本身变了才跑
+`site/deploy.sh`。Mac 端的更新检查读 GitHub 的 releases API（挑 `mac-v` 前缀的最新
+非预发布），比营销版本号，不再有第二处版本号可能和第一处对不上。
 
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)：push / PR 时无签名编译两端，
 不碰任何密钥，只保证代码没坏。
@@ -50,7 +57,7 @@ Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security fi
 | | `identity` | `Developer ID Application: Jinrui Hu (6NK6HJKB8Z)` | ✅ |
 | | `private_key` / `csr` | 原始私钥与 CSR，续期时可复用 | ✅ |
 | `apple-asc-api-key` | `key_id` / `issuer_id` / `p8` | ASC 团队密钥（Admin），notarytool 用 | ✅ 2026-08-22 建好 |
-| `cloudflare-libra` | `credential` / `account_id` | 个人 Cloudflare token | ✅ 2026-08-22 建好 |
+| `cloudflare-libra` | `credential` / `account_id` | 个人 Cloudflare token（只给 `site/deploy.sh` 用，发版流水线不再需要） | ✅ 2026-08-22 建好 |
 
 证书有效期到 **2031-08-23**；ASC 的 `.p8` 只能下载一次，1Password 里是唯一副本。
 
@@ -127,8 +134,8 @@ Mac 改完就能发，锁步只会让快的等慢的。两者的兼容契约是 
 3. 对应的流水线开跑。
 4. App Store 那一步仍然手动：在 App Store Connect 里选构建、填文案、提审。
 
-手动重跑 macOS 那半边：Actions 页面 → Release macOS → Run workflow，填版本号，
-`deploy_site` 可关掉（只出包不动官网）。
+手动重跑 macOS 那半边：Actions 页面 → Release macOS → Run workflow，填版本号。
+手动触发不会创建 Release（那一步限定 tag 触发），只出包并上传 artifact。
 
 **重推 tag 的规矩**：流水线失败而代码没改 → 直接 rerun，别动 tag。加了修复 commit 想
 重发同一个版本号 → 删 tag 重推（构建号取提交数，会自然变大，TestFlight 不会撞号）。

@@ -1,7 +1,12 @@
 name: Release macOS
 
 # Ships the Mac app: archive → Developer ID sign → notarize → staple → dmg
-# (signed, notarized, stapled) → publish to scan.libra.wiki.
+# (signed, notarized, stapled) → GitHub release.
+#
+# The website is deliberately not part of this. It links to
+# releases/latest/download/LibraScan.dmg, which GitHub resolves to whichever
+# release is newest, so shipping a version touches nothing outside this repo.
+# Deploy the site with site/deploy.sh when the site itself changes.
 #
 # iOS is NOT built here — TestFlight goes through Xcode Cloud, which needs no
 # certificates of its own (see docs/CI.md).
@@ -14,10 +19,6 @@ on:
       version:
         description: 'Marketing version (e.g. 1.0). Defaults to the tag name without "mac-v".'
         required: false
-      deploy_site:
-        description: 'Publish the dmg to scan.libra.wiki'
-        type: boolean
-        default: true
 
 permissions:
   contents: write        # creating the GitHub release
@@ -78,8 +79,6 @@ jobs:
           NOTARY_KEY_ID:        op://gh-action/apple-asc-api-key/key_id
           NOTARY_ISSUER_ID:     op://gh-action/apple-asc-api-key/issuer_id
           NOTARY_KEY_P8:        op://gh-action/apple-asc-api-key/p8
-          CLOUDFLARE_API_TOKEN:  op://gh-action/cloudflare-libra/credential
-          CLOUDFLARE_ACCOUNT_ID: op://gh-action/cloudflare-libra/account_id
 
       - name: Import the Developer ID certificate into a throwaway keychain
         run: |
@@ -175,7 +174,13 @@ jobs:
           V="${{ steps.v.outputs.version }}"
           B="${{ steps.v.outputs.build }}"
           DIR="build/release-$V"
-          SHA="$(awk '/\.dmg$/ {print $1}' "$DIR/SHA256SUMS")"
+          # The asset name carries no version, so
+          # releases/latest/download/LibraScan.dmg is a permanent address.
+          OUT="$RUNNER_TEMP/release"; mkdir -p "$OUT"
+          cp "$DIR/LibraScan-$V.dmg" "$OUT/LibraScan.dmg"
+          cp "$DIR/LibraScan-$V-mac.zip" "$OUT/LibraScan-mac.zip"
+          (cd "$OUT" && shasum -a 256 LibraScan.dmg LibraScan-mac.zip > SHA256SUMS)
+          SHA="$(awk '/LibraScan\.dmg$/ {print $1}' "$OUT/SHA256SUMS")"
           cat > "$RUNNER_TEMP/notes.md" <<NOTES
           LibraScan for Mac **$V** (build $B) — the companion that types what your iPhone scans.
 
@@ -189,34 +194,13 @@ jobs:
           encrypted peer-to-peer link and are versioned independently.
 
           \\`\\`\\`
-          SHA-256  $SHA  LibraScan-$V.dmg
+          SHA-256  $SHA  LibraScan.dmg
           \\`\\`\\`
           NOTES
           gh release create "$GITHUB_REF_NAME" \
             --title "LibraScan for Mac $V" \
             --notes-file "$RUNNER_TEMP/notes.md" \
-            "$DIR/LibraScan-$V.dmg" "$DIR/LibraScan-$V-mac.zip" "$DIR/SHA256SUMS"
-
-      - name: Publish to scan.libra.wiki
-        if: github.event_name != 'workflow_dispatch' || inputs.deploy_site
-        run: |
-          # The zone edge-caches static files for hours and the deploy token cannot purge,
-          # so the cache-busting tokens are bumped at deploy time (not committed).
-          B="${{ steps.v.outputs.build }}"
-          V="${{ steps.v.outputs.version }}"
-          sed -i '' -E "s/LibraScan\.dmg\?b=[0-9]+/LibraScan.dmg?b=${B}/g" \
-            site/index.html site/assets/app.js
-          sed -i '' -E "s/app\.js\?v=[0-9]+/app.js?v=${B}/g" site/index.html
-          # The Mac app polls this to tell users a newer build exists.
-          cat > site/appcast.json <<JSON
-          {
-            "version": "${V}",
-            "build": ${B},
-            "url": "https://scan.libra.wiki/dl/LibraScan.dmg",
-            "minimumSystemVersion": "15.0"
-          }
-          JSON
-          ./site/deploy.sh "${{ steps.v.outputs.version }}"
+            "$OUT/LibraScan.dmg" "$OUT/LibraScan-mac.zip" "$OUT/SHA256SUMS"
 
       - name: Clean up the keychain
         if: always()

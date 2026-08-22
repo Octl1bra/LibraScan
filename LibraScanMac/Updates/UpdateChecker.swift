@@ -12,14 +12,18 @@ enum UpdateKeys {
     static let lastCheck = "lastUpdateCheck"
 }
 
-/// Asks scan.libra.wiki whether a newer build exists.
+/// Asks GitHub whether a newer release exists.
 ///
 /// macOS has no first-party updater for apps distributed with a Developer ID:
 /// Apple's answer is the Mac App Store, and Sparkle is the community standard.
 /// LibraScan ships no third-party SDKs, so this is the smallest thing that does
-/// the job — one unparameterised GET, a build-number comparison, and a link to
-/// the download page. It never downloads or installs anything, and it sends
-/// nothing about the device or how the app is used.
+/// the job — one request, a version comparison, and a link. It never downloads
+/// or installs anything, and it sends nothing about the device or how the app
+/// is used.
+///
+/// Reading the releases API rather than a file on scan.libra.wiki means a
+/// release is complete the moment the tag finishes building: there is no second
+/// place holding a version number that could disagree with the first.
 @MainActor
 final class UpdateChecker: ObservableObject {
     enum Status: Equatable {
@@ -32,13 +36,27 @@ final class UpdateChecker: ObservableObject {
 
     @Published private(set) var status: Status = .idle
 
-    private static let feedURL = URL(string: "https://scan.libra.wiki/appcast.json")!
+    /// The repository publishes both `mac-v*` and `ios-v*` tags, so "latest
+    /// release" is not specific enough — this asks for the list and picks the
+    /// newest Mac one.
+    private static let releasesURL = URL(
+        string: "https://api.github.com/repos/Octl1bra/LibraScan/releases?per_page=20"
+    )!
+    private static let tagPrefix = "mac-v"
+    private static let assetName = "LibraScan.dmg"
     private static let interval: TimeInterval = 24 * 60 * 60
 
-    private struct Feed: Decodable {
-        let version: String
-        let build: Int
-        let url: URL
+    private struct Release: Decodable {
+        let tagName: String
+        let htmlUrl: URL
+        let draft: Bool
+        let prerelease: Bool
+        let assets: [Asset]
+
+        struct Asset: Decodable {
+            let name: String
+            let browserDownloadUrl: URL
+        }
     }
 
     var currentVersion: String {
@@ -53,8 +71,8 @@ final class UpdateChecker: ObservableObject {
         UserDefaults.standard.register(defaults: [UpdateKeys.automatic: true])
     }
 
-    /// Launch and menu-open path: respects the user's setting and checks at most
-    /// once a day. The Settings button calls `check()` directly instead.
+    /// Launch path: respects the user's setting and checks at most once a day.
+    /// The Settings button calls `check()` directly instead.
     func checkIfDue() {
         guard UserDefaults.standard.bool(forKey: UpdateKeys.automatic) else { return }
         if let last = UserDefaults.standard.object(forKey: UpdateKeys.lastCheck) as? Date,
@@ -69,10 +87,13 @@ final class UpdateChecker: ObservableObject {
         status = .checking
         UserDefaults.standard.set(Date.now, forKey: UpdateKeys.lastCheck)
 
-        var request = URLRequest(url: Self.feedURL)
-        // The download page is edge-cached; never answer from a stale local copy.
+        var request = URLRequest(url: Self.releasesURL)
         request.cachePolicy = .reloadIgnoringLocalCacheData
         request.timeoutInterval = 15
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        request.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
+        // GitHub rejects requests without one; identify the app, nothing about the user.
+        request.setValue("LibraScan/\(currentVersion)", forHTTPHeaderField: "User-Agent")
 
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -80,15 +101,41 @@ final class UpdateChecker: ObservableObject {
                 status = .failed
                 return
             }
-            let feed = try JSONDecoder().decode(Feed.self, from: data)
-            let installed = Int(currentBuild) ?? 0
-            status = feed.build > installed
-                ? .available(version: feed.version, url: feed.url)
-                : .upToDate
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let releases = try decoder.decode([Release].self, from: data)
+
+            guard let newest = releases.first(where: {
+                !$0.draft && !$0.prerelease && $0.tagName.hasPrefix(Self.tagPrefix)
+            }) else {
+                status = .upToDate
+                return
+            }
+
+            let version = String(newest.tagName.dropFirst(Self.tagPrefix.count))
+            guard Self.isNewer(version, than: currentVersion) else {
+                status = .upToDate
+                return
+            }
+            let asset = newest.assets.first { $0.name == Self.assetName }
+            status = .available(version: version, url: asset?.browserDownloadUrl ?? newest.htmlUrl)
         } catch {
-            // Offline, DNS, malformed feed — all the same to the user: try later.
+            // Offline, rate-limited, malformed — all the same to the user: try later.
             status = .failed
         }
+    }
+
+    /// Compares dotted numeric versions component by component, so 1.10 sorts
+    /// above 1.9 rather than below it the way a string compare would have it.
+    static func isNewer(_ candidate: String, than installed: String) -> Bool {
+        let a = candidate.split(separator: ".").map { Int($0) ?? 0 }
+        let b = installed.split(separator: ".").map { Int($0) ?? 0 }
+        for i in 0..<max(a.count, b.count) {
+            let l = i < a.count ? a[i] : 0
+            let r = i < b.count ? b[i] : 0
+            if l != r { return l > r }
+        }
+        return false
     }
 
     /// Hands the download to the browser. Installing stays a deliberate act:

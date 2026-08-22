@@ -7,7 +7,8 @@
 #   Dashboard → Workers & Pages → librascan → Custom domains → add scan.libra.wiki
 #   (Cloudflare creates the CNAME automatically when the zone is on the same account.)
 #
-# The Mac dmg is staged from build/release-<version> at deploy time and is NOT committed.
+# Static only. The Mac dmg lives on GitHub Releases; the site links to
+# releases/latest/download/LibraScan.dmg and never has to be redeployed for one.
 #
 # Cache note: the libra.wiki zone edge-caches .dmg/.js/.css for hours and this token cannot purge.
 # When assets or the dmg change, bump the ?v= / ?b= query strings in index.html and app.js.
@@ -30,14 +31,5 @@ if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] && [ -x "$OPSA" ]; then
   export CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID
 fi
 
-VERSION="${1:-1.0}"
-mkdir -p download dl
-SRC="../build/release-$VERSION/LibraScan-$VERSION.dmg"
-# /dl/LibraScan.dmg is the permanent address: it is what the site, the appcast,
-# and anything published elsewhere point at, and it never has to be revised for a
-# new version. The versioned copy stays so a specific build can still be linked.
-cp "$SRC" "dl/LibraScan.dmg"
-cp "$SRC" "dl/LibraScan-$VERSION.dmg"
-cp "$SRC" "download/LibraScan-$VERSION.dmg"   # kept for links published before /dl/
 npx --yes wrangler@latest pages project create librascan --production-branch main 2>/dev/null || true
 npx --yes wrangler@latest pages deploy . --project-name librascan --branch main --commit-dirty=true
