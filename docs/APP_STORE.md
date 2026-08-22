@@ -47,6 +47,8 @@ Get LibraScan for Mac at scan.libra.wiki. Tap “Type to Mac”, pick your Mac, 
 PRIVACY
 No account, no server, no analytics, no third-party SDK. Camera frames never leave the device. The iPhone-to-Mac link is an encrypted peer-to-peer connection built on Apple’s MultipeerConnectivity framework; nothing sits in between.
 
+LibraScan is open source, so none of that has to be taken on trust: github.com/Octl1bra/LibraScan
+
 Requires iOS 18. Type to Mac needs macOS 15, with Wi-Fi and Bluetooth on for both devices. Scanning and history work without a Mac.
 ```
 
@@ -89,6 +91,8 @@ QR、Data Matrix、Aztec、PDF417、EAN、UPC、Code 39/93/128、ITF-14、Codaba
 隐私
 没有账号、没有服务器、没有统计、没有第三方 SDK。相机画面不出设备。iPhone 到 Mac 的连接是基于 Apple MultipeerConnectivity 框架的加密点对点连接，中间没有任何东西。
 
+LibraScan 是开源的，上面这些不必只听我们说：github.com/Octl1bra/LibraScan
+
 需要 iOS 18。键入到 Mac 需要 macOS 15，两台设备开启 Wi-Fi 与蓝牙。扫描与记录不需要 Mac。
 ```
 
@@ -117,8 +121,11 @@ TESTING WITHOUT A MAC: Scanning, history, search and TXT export are fully functi
 
 TESTING TYPE TO MAC (optional): Install the free, Developer ID–signed and notarized Mac app from https://github.com/Octl1bra/LibraScan/releases/latest/download/LibraScan.dmg on macOS 15 or later, grant Accessibility when prompted, and keep Wi-Fi and Bluetooth on for both devices. On the iPhone, tap the keyboard icon, choose the Mac, and click Allow on the Mac. Put the cursor in TextEdit and scan any code; the text is typed at the cursor.
 
+SOURCE: The app is open source under Apache-2.0, so the claims above can be verified directly — no third-party SDK, no analytics, no networking beyond MultipeerConnectivity: https://github.com/Octl1bra/LibraScan
+
 REGIONS: The app functions identically in all regions; there are no regional differences in features or content.
 
+Source: https://github.com/Octl1bra/LibraScan
 Demo video: https://scan.libra.wiki/review/LibraScanMac-Demo.mp4
 Privacy policy: https://scan.libra.wiki/privacy/
 Support: https://scan.libra.wiki/support/
