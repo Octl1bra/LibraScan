@@ -54,6 +54,30 @@ final class ReopenDelegate: NSObject, NSApplicationDelegate {
         Self.shared = self
     }
 
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Makes the Services entry ("Scan Codes with LibraScan") reach us.
+        NSApp.servicesProvider = self
+    }
+
+    /// Finder's Open With, a drop on the icon, or `open -a`. Each path lands here.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        ImageScanWindowController.shared.show(urls: urls)
+    }
+
+    /// The Services menu hands files over on a pasteboard instead.
+    @objc func scanImages(
+        _ pasteboard: NSPasteboard,
+        userData: String?,
+        error: AutoreleasingUnsafeMutablePointer<NSString>
+    ) {
+        let urls = pasteboard.readObjects(forClasses: [NSURL.self]) as? [URL] ?? []
+        guard !urls.isEmpty else {
+            error.pointee = String(localized: "No image files were provided.") as NSString
+            return
+        }
+        ImageScanWindowController.shared.show(urls: urls)
+    }
+
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         // Same activation dance as the menu's Settings… button: without it the
         // window opens behind the focused app.

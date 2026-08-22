@@ -27,6 +27,14 @@ Both apps live in one Xcode project and share one bundle identifier (`com.Libra.
 
 Protocol details are in [docs/MAC_KEY_BRIDGE.md](docs/MAC_KEY_BRIDGE.md) §5.
 
+## Scanning an image on the Mac
+
+Right-click any image in Finder and pick **LibraScan** under *Open With*, or
+*Services → Scan Codes with LibraScan*. Codes are read with Vision — no preview
+step, no window to dismiss when there is only one result: a single code goes
+straight to the clipboard. Several files, several codes, or none at all open a
+small results panel instead.
+
 ## Layout
 
 | Path | Contents |
