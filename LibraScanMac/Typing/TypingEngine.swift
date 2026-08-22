@@ -12,12 +12,14 @@ nonisolated enum TypingSuffix: String, CaseIterable {
     case none
     case returnKey = "return"
     case tab
+    case space
 
     fileprivate var virtualKey: CGKeyCode? {
         switch self {
         case .none: nil
         case .returnKey: 36  // kVK_Return
         case .tab: 48        // kVK_Tab
+        case .space: 49      // kVK_Space
         }
     }
 }

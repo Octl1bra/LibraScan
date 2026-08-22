@@ -17,9 +17,21 @@ struct LibraScanMacApp: App {
             MenuContentView(server: server, updates: updates)
         } label: {
             StatusIconLabel(server: server)
-                .task { updates.checkIfDue() }
+                .task {
+                    updates.checkIfDue()
+                    // The user grants Accessibility in System Settings, outside
+                    // this app; in `.menu` style there is no reliable onAppear
+                    // to notice on, so watch for it while it is still missing.
+                    while !Task.isCancelled, !server.isAccessibilityTrusted {
+                        try? await Task.sleep(for: .seconds(2))
+                        server.refreshAccessibility()
+                    }
+                }
         }
-        .menuBarExtraStyle(.window)
+        // A real AppKit menu, not a window: the system supplies row metrics,
+        // the shortcut column, vibrancy and highlighting for free, and no
+        // hand-drawn approximation of those ever quite matches.
+        .menuBarExtraStyle(.menu)
 
         Settings {
             SettingsView(server: server, updates: updates)
@@ -63,9 +75,12 @@ struct StatusIconLabel: View {
             }
     }
 
+    /// "keyboard.slash" does not exist in SF Symbols — asking for it rendered
+    /// nothing at all, so pausing made the menu bar icon vanish. Pause is the
+    /// emergency stop; it has to stay visible and obviously different.
     private var iconName: String {
         if server.isPaused {
-            "keyboard.slash"
+            "pause.fill"
         } else if server.connectedPeerName != nil {
             "keyboard.fill"
         } else {

@@ -121,6 +121,16 @@
         }
       }
     },
+    "Connection" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接"
+          }
+        }
+      }
+    },
     "Couldn't check" : {
       "localizations" : {
         "zh-Hans" : {
@@ -157,6 +167,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "不允许"
+          }
+        }
+      }
+    },
+    "Download Version %@…" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 %@ 版本…"
           }
         }
       }
@@ -231,6 +251,16 @@
         }
       }
     },
+    "Pause Typing" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂停键入"
+          }
+        }
+      }
+    },
     "Pause typing" : {
       "localizations" : {
         "zh-Hans" : {
@@ -251,6 +281,16 @@
         }
       }
     },
+    "Press Space" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按空格"
+          }
+        }
+      }
+    },
     "Press Tab" : {
       "localizations" : {
         "zh-Hans" : {
@@ -267,6 +307,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "退出"
+          }
+        }
+      }
+    },
+    "Quit LibraScan" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出 LibraScan"
           }
         }
       }
@@ -327,6 +377,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "信任的设备"
+          }
+        }
+      }
+    },
+    "Typing" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "键入"
           }
         }
       }

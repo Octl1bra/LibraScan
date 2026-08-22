@@ -20,7 +20,7 @@ on:
         default: true
 
 permissions:
-  contents: read
+  contents: write        # creating the GitHub release
 
 env:
   # Everything already published is at or below build 3 (dmg + TestFlight, 2026-08-22).
@@ -165,6 +165,37 @@ jobs:
           name: LibraScan-${{ steps.v.outputs.version }}-macOS
           path: build/release-${{ steps.v.outputs.version }}/*
           if-no-files-found: error
+
+      # Only for a real tag: a manual run is a rehearsal and shouldn't mint a release.
+      - name: Publish the GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.v.outputs.version }}"
+          B="${{ steps.v.outputs.build }}"
+          DIR="build/release-$V"
+          SHA="$(awk '/\.dmg$/ {print $1}' "$DIR/SHA256SUMS")"
+          cat > "$RUNNER_TEMP/notes.md" <<NOTES
+          LibraScan for Mac **$V** (build $B) — the companion that types what your iPhone scans.
+
+          Requires macOS 15 or later. Universal (Apple silicon and Intel). Signed with a
+          Developer ID certificate and notarized by Apple, so it opens without a warning.
+
+          Drag it into Applications, launch it, and grant Accessibility when asked — that
+          permission is what lets it send keystrokes, and it is used for nothing else.
+
+          The iPhone app is a separate release (\\`ios-v*\\`); the two talk over an
+          encrypted peer-to-peer link and are versioned independently.
+
+          \\`\\`\\`
+          SHA-256  $SHA  LibraScan-$V.dmg
+          \\`\\`\\`
+          NOTES
+          gh release create "$GITHUB_REF_NAME" \
+            --title "LibraScan for Mac $V" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            "$DIR/LibraScan-$V.dmg" "$DIR/LibraScan-$V-mac.zip" "$DIR/SHA256SUMS"
 
       - name: Publish to scan.libra.wiki
         if: github.event_name != 'workflow_dispatch' || inputs.deploy_site

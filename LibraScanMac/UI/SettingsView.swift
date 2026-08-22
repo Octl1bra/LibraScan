@@ -16,24 +16,27 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section {
+            Section("Typing") {
                 Picker("After typing a code", selection: $suffix) {
                     Text("Do nothing").tag(TypingSuffix.none.rawValue)
                     Text("Press Return").tag(TypingSuffix.returnKey.rawValue)
                     Text("Press Tab").tag(TypingSuffix.tab.rawValue)
+                    Text("Press Space").tag(TypingSuffix.space.rawValue)
                 }
-                HStack {
-                    Slider(value: $delayMs, in: 1...20, step: 1) {
-                        Text("Keystroke interval")
+                // LabeledContent, not a hand-rolled HStack: this keeps the label
+                // in the form's leading column, aligned with the picker above it.
+                LabeledContent("Keystroke interval") {
+                    HStack(spacing: 8) {
+                        Slider(value: $delayMs, in: 1...20, step: 1)
+                        Text("\(Int(delayMs)) ms")
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                            .frame(width: 46, alignment: .trailing)
                     }
-                    Text("\(Int(delayMs)) ms")
-                        .monospacedDigit()
-                        .foregroundStyle(.secondary)
-                        .frame(width: 48, alignment: .trailing)
                 }
             }
 
-            Section {
+            Section("Connection") {
                 Toggle("Automatically accept trusted devices", isOn: $autoAccept)
             }
 
@@ -47,14 +50,12 @@ struct SettingsView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(peer.name)
                                 Text(peer.pairedAt, format: .dateTime.year().month().day())
-                                    .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                             Spacer()
                             Button("Remove") {
                                 server.removeTrustedPeer(peer.name)
                             }
-                            .controlSize(.small)
                         }
                     }
                 }
@@ -62,7 +63,10 @@ struct SettingsView: View {
             aboutSection
         }
         .formStyle(.grouped)
-        .frame(width: 400, height: 460)
+        // Width fixed like a System Settings pane; height follows the content,
+        // because the trusted-device list grows and shrinks.
+        .frame(width: 460)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     /// The two apps ship on their own schedules, so the version has to be
@@ -79,7 +83,6 @@ struct SettingsView: View {
                 Button("Check Now") {
                     Task { await updates.check() }
                 }
-                .controlSize(.small)
                 .disabled(updates.status == .checking)
                 Spacer()
                 updateStatusLabel
@@ -96,14 +99,11 @@ struct SettingsView: View {
             ProgressView().controlSize(.small)
         case .upToDate:
             Label("Up to date", systemImage: "checkmark.circle.fill")
-                .font(.caption)
                 .foregroundStyle(.secondary)
         case .available(let version, _):
             Button("Get \(version)") { updates.openDownloadPage() }
-                .controlSize(.small)
         case .failed:
             Label("Couldn't check", systemImage: "exclamationmark.triangle.fill")
-                .font(.caption)
                 .foregroundStyle(.orange)
         }
     }

@@ -45,7 +45,14 @@ struct ScanResultBanner: View {
             }
         }
         .padding(12)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        // Opaque, not material: the surface behind this is a live camera feed,
+        // which is moving high-contrast noise rather than useful context. Text
+        // has to stay readable no matter what the lens is pointed at.
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.3), radius: 12, y: 4)
+        )
         .padding(.horizontal, 16)
     }
 
@@ -142,5 +149,5 @@ struct SymbologyTag: View {
         )
     }
     .frame(maxHeight: .infinity)
-    .background(.black)
+    .background(Color(white: 0.35))   // stands in for a camera feed
 }

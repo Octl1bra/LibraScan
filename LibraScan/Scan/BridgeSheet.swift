@@ -55,6 +55,10 @@ struct BridgeSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+        // At the medium detent the camera is still running behind the top half
+        // of the screen. A glass sheet lets that moving image through and makes
+        // the list of Macs hard to read, so this one is opaque.
+        .presentationBackground(Color(.systemGroupedBackground))
         .onAppear { bridge.sheetOpened() }
         .onDisappear { bridge.sheetClosed() }
     }
