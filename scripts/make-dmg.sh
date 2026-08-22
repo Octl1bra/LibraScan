@@ -42,4 +42,36 @@ done
   -D volicon="$WORK/LibraScan.icns" \
   -D win_h="$WIN_H" -D icon_y="$ICON_Y" \
   "LibraScan" "$OUT/LibraScan-$VERSION.dmg"
-echo "built $OUT/LibraScan-$VERSION.dmg"
+DMG="$OUT/LibraScan-$VERSION.dmg"
+echo "built $DMG"
+
+# 4. Sign + notarize + staple the dmg.
+#
+# Gatekeeper assesses the disk image itself, not just the app inside: an unsigned dmg is
+# "rejected / no usable signature" on download, even when the app within is notarized and
+# stapled (verify with: syspolicy_check distribution <dmg>).
+#
+# codesign only uses identities in the local keychain. The Developer ID Application
+# certificate Xcode creates automatically is CLOUD-MANAGED — its private key lives on
+# Apple's servers, so codesign reports "no identity found". Create a second certificate
+# from a CSR instead (Keychain Access → Certificate Assistant), which keeps the private
+# key local. See docs/CI.md.
+if [ -n "${DEVELOPER_ID_IDENTITY:-}" ]; then
+  echo "signing the dmg as: $DEVELOPER_ID_IDENTITY"
+  codesign --force --sign "$DEVELOPER_ID_IDENTITY" --timestamp "$DMG"
+  codesign --verify --verbose=2 "$DMG"
+
+  if [ -n "${NOTARY_KEY_PATH:-}" ] && [ -n "${NOTARY_KEY_ID:-}" ] && [ -n "${NOTARY_ISSUER_ID:-}" ]; then
+    xcrun notarytool submit "$DMG" \
+      --key "$NOTARY_KEY_PATH" --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
+    xcrun stapler staple "$DMG"
+    xcrun stapler validate "$DMG"
+    syspolicy_check distribution "$DMG"
+  else
+    echo "WARNING: dmg signed but NOT notarized (no NOTARY_* credentials)." >&2
+    echo "         Gatekeeper rejects a signed-but-unnotarized dmg on download." >&2
+  fi
+else
+  echo "WARNING: dmg is neither signed nor notarized — Gatekeeper WILL reject it when a user" >&2
+  echo "         downloads it. Set DEVELOPER_ID_IDENTITY and NOTARY_*; see docs/CI.md." >&2
+fi

@@ -1,0 +1,163 @@
+name: Release macOS
+
+# Ships the Mac app: archive → Developer ID sign → notarize → staple → dmg
+# (signed, notarized, stapled) → publish to scan.libra.wiki.
+#
+# iOS is NOT built here — TestFlight goes through Xcode Cloud, which needs no
+# certificates of its own (see docs/CI.md).
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Marketing version (e.g. 1.0). Defaults to the tag name without "v".'
+        required: false
+      deploy_site:
+        description: 'Publish the dmg to scan.libra.wiki'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-macos
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-26          # Xcode 26.6 by default
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Resolve version and build number
+        id: v
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#v}"; fi
+          case "$VERSION" in
+            ''|*[!0-9.]*) echo "::error::could not resolve a numeric version from '${GITHUB_REF_NAME}'"; exit 1 ;;
+          esac
+          echo "version=$VERSION"          >> "$GITHUB_OUTPUT"
+          echo "build=${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "Releasing $VERSION (${GITHUB_RUN_NUMBER})"
+
+      # Every credential lives in 1Password; the repo holds exactly one secret,
+      # the read-only service-account token for the gh-action vault.
+      - name: Load secrets from 1Password
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          DEV_ID_P12_BASE64:    op://gh-action/apple-dev-id-cert/p12_base64
+          DEV_ID_P12_PASSWORD:  op://gh-action/apple-dev-id-cert/password
+          DEV_ID_IDENTITY:      op://gh-action/apple-dev-id-cert/identity
+          NOTARY_KEY_ID:        op://gh-action/apple-asc-api-key/key_id
+          NOTARY_ISSUER_ID:     op://gh-action/apple-asc-api-key/issuer_id
+          NOTARY_KEY_P8:        op://gh-action/apple-asc-api-key/p8
+          CLOUDFLARE_API_TOKEN:  op://gh-action/cloudflare-libra/credential
+          CLOUDFLARE_ACCOUNT_ID: op://gh-action/cloudflare-libra/account_id
+
+      - name: Import the Developer ID certificate into a throwaway keychain
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
+          PASSWORD="$(uuidgen)"
+          security create-keychain -p "$PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 7200 "$KEYCHAIN"
+          security unlock-keychain -p "$PASSWORD" "$KEYCHAIN"
+          printf %s "$DEV_ID_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$DEV_ID_P12_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/productsign
+          rm -f "$RUNNER_TEMP/cert.p12"
+          # Let codesign use the key without an interactive prompt.
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$PASSWORD" "$KEYCHAIN" >/dev/null
+          # Keep the login keychain in the search list so system anchors still resolve.
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          security find-identity -v -p codesigning "$KEYCHAIN"
+
+      - name: Write the notary API key
+        run: |
+          mkdir -p "$RUNNER_TEMP/private_keys"
+          printf %s "$NOTARY_KEY_P8" > "$RUNNER_TEMP/private_keys/AuthKey.p8"
+          chmod 600 "$RUNNER_TEMP/private_keys/AuthKey.p8"
+
+      # The Mac target has no entitlements, so a Developer ID archive needs no
+      # provisioning profile — manual signing with the certificate alone is enough.
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -project LibraScan.xcodeproj \
+            -scheme LibraScanMac \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/LibraScanMac.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            MARKETING_VERSION="${{ steps.v.outputs.version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.v.outputs.build }}" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Developer ID Application" \
+            DEVELOPMENT_TEAM=6NK6HJKB8Z \
+            OTHER_CODE_SIGN_FLAGS="--timestamp"
+
+      - name: Export the Developer ID app
+        run: |
+          cat > "$RUNNER_TEMP/export.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>developer-id</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>6NK6HJKB8Z</string>
+            <key>signingCertificate</key><string>Developer ID Application</string>
+            <key>destination</key><string>export</string>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/LibraScanMac.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/export.plist" \
+            -exportPath "$RUNNER_TEMP/export"
+          codesign -dv --verbose=2 "$RUNNER_TEMP/export/LibraScan.app"
+
+      - name: Notarize and staple the app
+        run: |
+          ditto -c -k --keepParent "$RUNNER_TEMP/export/LibraScan.app" "$RUNNER_TEMP/LibraScan.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/LibraScan.zip" \
+            --key "$RUNNER_TEMP/private_keys/AuthKey.p8" \
+            --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
+          xcrun stapler staple "$RUNNER_TEMP/export/LibraScan.app"
+          syspolicy_check distribution "$RUNNER_TEMP/export/LibraScan.app"
+
+      # make-dmg.sh signs, notarizes and staples the disk image itself when these are set.
+      - name: Build the dmg
+        run: |
+          export DEVELOPER_ID_IDENTITY="$DEV_ID_IDENTITY"
+          export NOTARY_KEY_PATH="$RUNNER_TEMP/private_keys/AuthKey.p8"
+          pipx install dmgbuild || python3 -m pip install --user --break-system-packages dmgbuild
+          scripts/make-dmg.sh "$RUNNER_TEMP/export/LibraScan.app" "${{ steps.v.outputs.version }}"
+          V="${{ steps.v.outputs.version }}"
+          ditto -c -k --keepParent "$RUNNER_TEMP/export/LibraScan.app" "build/release-$V/LibraScan-$V-mac.zip"
+          (cd "build/release-$V" && shasum -a 256 *.dmg *.zip | tee SHA256SUMS)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LibraScan-${{ steps.v.outputs.version }}-macOS
+          path: build/release-${{ steps.v.outputs.version }}/*
+          if-no-files-found: error
+
+      - name: Publish to scan.libra.wiki
+        if: github.event_name != 'workflow_dispatch' || inputs.deploy_site
+        run: |
+          # The zone edge-caches static files for hours and the deploy token cannot purge,
+          # so the cache-busting tokens are bumped at deploy time (not committed).
+          B="${{ steps.v.outputs.build }}"
+          sed -i '' -E "s/LibraScan-[0-9.]+\.dmg\?b=[0-9]+/LibraScan-${{ steps.v.outputs.version }}.dmg?b=${B}/g" \
+            site/index.html site/assets/app.js
+          sed -i '' -E "s/app\.js\?v=[0-9]+/app.js?v=${B}/g" site/index.html
+          ./site/deploy.sh "${{ steps.v.outputs.version }}"
+
+      - name: Clean up the keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/build.keychain-db" || true

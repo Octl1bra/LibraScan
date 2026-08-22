@@ -65,6 +65,11 @@ xcodebuild -project LibraScan.xcodeproj -scheme LibraScanMac build
 
 两端 bundle ID 一致，将来若要上 Mac App Store 可直接并入同一条 App Store Connect 记录（Universal Purchase）。
 
+### 自动发布
+
+打一个 `v*` tag，iOS 走 Xcode Cloud 进 TestFlight，macOS 走 GitHub Actions 出公证 dmg 并更新官网。
+配置与凭据见 [docs/CI.md](docs/CI.md)。下面是本地手动出包的等价流程。
+
 ### 出包
 
 两端都用 Xcode 自动签名，凭据来自登录 Xcode 的开发者账号：

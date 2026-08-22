@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['site/**', 'docs/**', '**/*.md']
+  pull_request:
+    paths-ignore: ['site/**', 'docs/**', '**/*.md']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.scheme }}
+    runs-on: macos-26          # Xcode 26.6 by default — same toolchain as the release job
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - scheme: LibraScan
+            destination: generic/platform=iOS
+          - scheme: LibraScanMac
+            destination: platform=macOS
+    steps:
+      - uses: actions/checkout@v5
+
+      # No certificates here on purpose: this job only proves the code compiles.
+      # Signing happens in release-macos.yml (Mac) and Xcode Cloud (iOS).
+      - name: Build (unsigned)
+        run: |
+          xcodebuild build \
+            -project LibraScan.xcodeproj \
+            -scheme "${{ matrix.scheme }}" \
+            -configuration Debug \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
