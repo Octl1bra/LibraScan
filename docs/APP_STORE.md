@@ -1,6 +1,7 @@
 # LibraScan — App Store 文案（iOS 1.0）
 
-> 参考 Things 3 的商店页：短段落、小标题、不喊口号。事实核对自代码与 Info.plist（2026-08-22）。
+> 参考 Things 3 的商店页：短段落、小标题、不喊口号。
+> 事实核对自代码、Info.plist 与线上 URL（2026-08-22，文档内所有链接实测 200）。
 
 | 字段 | 填写 |
 | --- | --- |
@@ -11,6 +12,7 @@
 | Support / Marketing / Privacy URL | `https://scan.libra.wiki/support/` · `https://scan.libra.wiki/` · `https://scan.libra.wiki/privacy/` |
 | App Privacy | 第一题答 No → Data Not Collected |
 | Sign-in | 不需要，无演示账号 |
+| 演示视频（给审核员） | `https://scan.libra.wiki/review/LibraScanMac-Demo.mp4`（未公开索引，站内无链接） |
 
 ## English
 
@@ -40,7 +42,7 @@ HISTORY
 Every scan is saved with its type and time. Search, swipe to delete, export everything as TXT.
 
 TYPE TO MAC
-Get LibraScan for Mac at scan.libra.wiki. Tap “Type to Mac”, pick your Mac, click Allow. Scans appear at the cursor, optionally followed by Return or Tab. Works with CJK text and emoji.
+Get LibraScan for Mac at scan.libra.wiki. Tap “Type to Mac”, pick your Mac, click Allow. Scans appear at the cursor, optionally followed by Return, Tab or Space. Works with CJK text and emoji.
 
 PRIVACY
 No account, no server, no analytics, no third-party SDK. Camera frames never leave the device. The iPhone-to-Mac link is an encrypted peer-to-peer connection built on Apple’s MultipeerConnectivity framework; nothing sits in between.
@@ -82,7 +84,7 @@ QR、Data Matrix、Aztec、PDF417、EAN、UPC、Code 39/93/128、ITF-14、Codaba
 每次识别自动保存，带码制和时间。可搜索、左滑删除、一键导出 TXT。
 
 键入到 Mac
-在 scan.libra.wiki 下载 LibraScan for Mac。点「键入到 Mac」，选中你的 Mac，点「允许」。内容出现在光标处，可自动补回车或 Tab。中文、emoji 照样键入。
+在 scan.libra.wiki 下载 LibraScan for Mac。点「键入到 Mac」，选中你的 Mac，点「允许」。内容出现在光标处，可自动补回车、Tab 或空格。中文、emoji 照样键入。
 
 隐私
 没有账号、没有服务器、没有统计、没有第三方 SDK。相机画面不出设备。iPhone 到 Mac 的连接是基于 Apple MultipeerConnectivity 框架的加密点对点连接，中间没有任何东西。
@@ -107,12 +109,17 @@ NETWORK: The app makes no internet connections. Its only network feature is the 
 
 PERMISSIONS: Camera (frames are processed on device, never stored or uploaded) and Local Network (Type to Mac only).
 
-TESTING WITHOUT A MAC: Scanning, history, search and TXT export are fully functional on their own. Opening “Type to Mac” with no Mac nearby shows an empty list with a hint — expected behaviour, not a bug.
+DEMO VIDEO: “Type to Mac” needs a second device, so here is a screen recording of the whole flow — the iPhone scans a code and the text is typed into a text field on the Mac:
+https://scan.libra.wiki/review/LibraScanMac-Demo.mp4
+(1.4 MB, no sign-in, no expiry. That page is not linked from the site and is excluded from search engines; it exists for this review.)
+
+TESTING WITHOUT A MAC: Scanning, history, search and TXT export are fully functional on their own — the bridge is optional and the app is complete without it. Opening “Type to Mac” with no Mac nearby shows an empty list with a hint — expected behaviour, not a bug.
 
 TESTING TYPE TO MAC (optional): Install the free, Developer ID–signed and notarized Mac app from https://github.com/Octl1bra/LibraScan/releases/latest/download/LibraScan.dmg on macOS 15 or later, grant Accessibility when prompted, and keep Wi-Fi and Bluetooth on for both devices. On the iPhone, tap the keyboard icon, choose the Mac, and click Allow on the Mac. Put the cursor in TextEdit and scan any code; the text is typed at the cursor.
 
 REGIONS: The app functions identically in all regions; there are no regional differences in features or content.
 
+Demo video: https://scan.libra.wiki/review/LibraScanMac-Demo.mp4
 Privacy policy: https://scan.libra.wiki/privacy/
 Support: https://scan.libra.wiki/support/
 Contact: me@libra.wiki
