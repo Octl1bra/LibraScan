@@ -29,7 +29,7 @@ jobs:
           - scheme: LibraScanMac
             destination: platform=macOS
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # No certificates here on purpose: this job only proves the code compiles.
       # Signing happens in release-macos.yml (Mac) and Xcode Cloud (iOS).
