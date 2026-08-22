@@ -23,7 +23,10 @@ guard args.count >= 4 else {
     FileHandle.standardError.write(Data("usage: asc-jwt.swift <key.p8> <key-id> <issuer-id> [lifetime]\n".utf8))
     exit(64)
 }
-let lifetime = args.count > 4 ? Int(args[4]) ?? 1200 : 1200
+// App Store Connect refuses any token that expires more than 20 minutes out,
+// and answers 401 without saying why — so clamp rather than pass it through.
+let requested = args.count > 4 ? Int(args[4]) ?? 1200 : 1200
+let lifetime = min(max(requested, 60), 1200)
 
 do {
     let pem = try String(contentsOfFile: args[1], encoding: .utf8)

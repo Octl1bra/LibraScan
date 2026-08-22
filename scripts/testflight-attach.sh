@@ -9,14 +9,27 @@ set -eu
 KEY="$1"; KEY_ID="$2"; ISSUER="$3"; BUILD="$4"; GROUP="$5"
 API="https://api.appstoreconnect.apple.com/v1"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-JWT="$(swift "$SCRIPT_DIR/asc-jwt.swift" "$KEY" "$KEY_ID" "$ISSUER" 1800)"
+[ -f "$SCRIPT_DIR/asc-jwt.swift" ] || { echo "missing $SCRIPT_DIR/asc-jwt.swift" >&2; exit 1; }
+JWT="$(swift "$SCRIPT_DIR/asc-jwt.swift" "$KEY" "$KEY_ID" "$ISSUER" 1200)"
+# An empty token turns every request into a 401 and the poll below would just
+# report PENDING until it timed out — fail here instead, where the cause is plain.
+[ -n "$JWT" ] || { echo "could not mint an App Store Connect token" >&2; exit 1; }
+PROBE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
+    -H "Authorization: Bearer $JWT" "$API/builds?limit=1")"
+[ "$PROBE" = "200" ] || { echo "App Store Connect rejected the token (HTTP $PROBE)" >&2; exit 1; }
 
 BUILD_ID=""
 i=0
 while [ "$i" -lt 30 ]; do
     i=$((i + 1))
-    LINE="$(curl -sS --max-time 30 -H "Authorization: Bearer $JWT" \
-        "$API/builds?limit=10&sort=-uploadedDate" \
+    BODY="$(curl -sS --max-time 30 -H "Authorization: Bearer $JWT" \
+        "$API/builds?limit=10&sort=-uploadedDate" || true)"
+    if [ -z "$BODY" ]; then
+        echo "  [$((i * 30))s] request failed, retrying"
+        sleep 30
+        continue
+    fi
+    LINE="$(printf '%s' "$BODY" \
         | BUILD="$BUILD" python3 -c 'import json, os, sys
 target = os.environ["BUILD"]
 for b in json.load(sys.stdin).get("data", []):
@@ -43,9 +56,10 @@ CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 -X POST \
     -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
     -d "{\"data\":[{\"type\":\"builds\",\"id\":\"$BUILD_ID\"}]}" \
     "$API/betaGroups/$GROUP/relationships/builds")"
-if [ "$CODE" = "204" ]; then
-    echo "build $BUILD added to group $GROUP"
-else
-    echo "could not add build $BUILD to group $GROUP (HTTP $CODE)" >&2
-    exit 1
-fi
+case "$CODE" in
+    204) echo "build $BUILD added to group $GROUP" ;;
+    # A group that takes every build already has this one; saying so is not a
+    # failure, and a re-run of the same release must not turn red because of it.
+    422) echo "build $BUILD was already in group $GROUP" ;;
+    *)   echo "could not add build $BUILD to group $GROUP (HTTP $CODE)" >&2; exit 1 ;;
+esac
