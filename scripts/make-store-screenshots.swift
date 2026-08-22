@@ -2,11 +2,35 @@
 import AppKit
 import Foundation
 
-private let canvasSize = NSSize(width: 1320, height: 2868)
-private let screenshotWidth: CGFloat = 1160
-private let screenshotTop: CGFloat = 2350
-private let cornerRadius: CGFloat = 64
-private let titleFont = NSFont.systemFont(ofSize: 82, weight: .semibold)
+// App Store Connect asks for a specific pixel size per device class and rejects
+// anything else, so the canvas is an argument rather than a constant: pass
+// `--size 1242x2688` to switch. Everything below is expressed as a fraction of
+// the canvas, which is why changing it moves the whole layout intact instead of
+// leaving the title stranded where the old canvas used to end.
+private let canvasSize: NSSize = {
+    let args = CommandLine.arguments
+    guard let flag = args.firstIndex(of: "--size"), flag + 1 < args.count else {
+        return NSSize(width: 1284, height: 2778)   // 6.5" display
+    }
+    let parts = args[flag + 1].lowercased().split(separator: "x")
+    guard parts.count == 2, let w = Double(parts[0]), let h = Double(parts[1]) else {
+        fputs("make-store-screenshots: --size expects WIDTHxHEIGHT, e.g. 1284x2778\n", stderr)
+        exit(64)
+    }
+    return NSSize(width: w, height: h)
+}()
+
+// Ratios taken from the layout that was tuned by hand at 1320 × 2868.
+private let screenshotWidth = canvasSize.width * (1160.0 / 1320.0)
+private let screenshotTop = canvasSize.height * (2350.0 / 2868.0)
+private let cornerRadius = canvasSize.width * (64.0 / 1320.0)
+private let titleFont = NSFont.systemFont(ofSize: canvasSize.width * (82.0 / 1320.0), weight: .semibold)
+private let titleRect = NSRect(
+    x: canvasSize.width * (80.0 / 1320.0),
+    y: canvasSize.height * (2488.0 / 2868.0),
+    width: canvasSize.width * (1160.0 / 1320.0),
+    height: canvasSize.height * (130.0 / 2868.0)
+)
 
 private struct StoreShot {
     let inputName: String
@@ -128,10 +152,7 @@ private func render(
         .foregroundColor: ink,
         .paragraphStyle: paragraph,
     ]
-    (shot.title as NSString).draw(
-        in: NSRect(x: 80, y: 2488, width: 1160, height: 130),
-        withAttributes: attributes
-    )
+    (shot.title as NSString).draw(in: titleRect, withAttributes: attributes)
 
     NSGraphicsContext.restoreGraphicsState()
     guard let png = bitmap.representation(using: .png, properties: [:]) else {
@@ -178,7 +199,7 @@ do {
                     options: .atomic
                 )
             }
-            print("Wrote build/store/\(locale.directory)/\(shot.outputName) [\(paperHex), \(inkHex), \(mutedHex)]")
+            print("Wrote build/store/\(locale.directory)/\(shot.outputName)  \(Int(canvasSize.width))×\(Int(canvasSize.height))")
         }
     }
 } catch {

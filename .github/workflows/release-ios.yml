@@ -1,0 +1,133 @@
+name: Release iOS
+
+# Ships the iPhone app: archive → App Store Connect → TestFlight.
+#
+# Signing is delegated to xcodebuild with the App Store Connect API key: given
+# -allowProvisioningUpdates it creates the distribution certificate and the
+# provisioning profile on demand, so no .p12 has to be carried around the way
+# the macOS workflow needs one for Developer ID.
+
+on:
+  push:
+    tags: ['ios-v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Marketing version (e.g. 1.0). Defaults to the tag name without "ios-v".'
+        required: false
+
+permissions:
+  contents: read
+
+env:
+  # Everything already on TestFlight is at or below build 63 (2026-08-22).
+  BUILD_FLOOR: 64
+
+concurrency:
+  group: release-ios
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0          # the build number is the commit count
+
+      - name: Resolve version and build number
+        id: v
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then VERSION="${GITHUB_REF_NAME#ios-v}"; fi
+          case "$VERSION" in
+            ''|*[!0-9.]*) echo "::error::could not resolve a numeric version from '${GITHUB_REF_NAME}'"; exit 1 ;;
+          esac
+
+          # Same counter the macOS pipeline uses, for the same reason:
+          # github.run_number restarts at 1 per workflow and TestFlight refuses
+          # a build number it has already accepted.
+          BUILD="$(git rev-list --count HEAD)"
+          if [ "$BUILD" -lt "$BUILD_FLOOR" ]; then
+            echo "::error::build number $BUILD is below the floor $BUILD_FLOOR — shallow clone?"
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD"     >> "$GITHUB_OUTPUT"
+          echo "Releasing $VERSION ($BUILD)"
+
+      - name: Load secrets from 1Password
+        uses: 1password/load-secrets-action@v5
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          ASC_KEY_ID:    op://gh-action/apple-asc-api-key/key_id
+          ASC_ISSUER_ID: op://gh-action/apple-asc-api-key/issuer_id
+          ASC_KEY_P8:    op://gh-action/apple-asc-api-key/p8
+
+      - name: Write the App Store Connect API key
+        run: |
+          mkdir -p "$RUNNER_TEMP/private_keys"
+          printf %s "$ASC_KEY_P8" > "$RUNNER_TEMP/private_keys/AuthKey.p8"
+          chmod 600 "$RUNNER_TEMP/private_keys/AuthKey.p8"
+
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -project LibraScan.xcodeproj \
+            -scheme LibraScan \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/LibraScan.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            MARKETING_VERSION="${{ steps.v.outputs.version }}" \
+            CURRENT_PROJECT_VERSION="${{ steps.v.outputs.build }}" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/private_keys/AuthKey.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Check that no debug scaffolding shipped
+        run: |
+          APP="$RUNNER_TEMP/LibraScan.xcarchive/Products/Applications/LibraScan.app"
+          # The screenshot fixtures live behind #if DEBUG; prove it rather than trust it.
+          if LC_ALL=C grep -ral -e 'LibraScanDemoMode' "$APP" >/dev/null 2>&1; then
+            echo "::error::demo-mode scaffolding is present in a Release archive"
+            exit 1
+          fi
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Info.plist"
+
+      - name: Upload to TestFlight
+        run: |
+          cat > "$RUNNER_TEMP/export.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>6NK6HJKB8Z</string>
+            <key>destination</key><string>upload</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/LibraScan.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/export.plist" \
+            -exportPath "$RUNNER_TEMP/upload" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/private_keys/AuthKey.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Add the build to the internal group
+        run: |
+          scripts/testflight-attach.sh \
+            "$RUNNER_TEMP/private_keys/AuthKey.p8" \
+            "$ASC_KEY_ID" "$ASC_ISSUER_ID" \
+            "${{ steps.v.outputs.build }}" \
+            1dff8103-824c-4c31-9b69-1aa6050a3b67   # LibraTest (internal)
