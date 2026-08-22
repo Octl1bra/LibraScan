@@ -191,6 +191,16 @@
         }
       }
     },
+    "Get LibraScan for Mac" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载 Mac 版 LibraScan"
+          }
+        }
+      }
+    },
     "History" : {
       "localizations" : {
         "zh-Hans" : {
@@ -497,6 +507,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已键入 Mac"
+          }
+        }
+      }
+    },
+    "Typing needs the free Mac app. Download it at scan.libra.wiki, then open it on your Mac — it lives in the menu bar." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "键入功能需要免费的 Mac 端。在 scan.libra.wiki 下载后在 Mac 上打开，它住在菜单栏里。"
           }
         }
       }

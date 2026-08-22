@@ -14,6 +14,11 @@ struct BridgeSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
+    /// Where the free Mac app comes from. Half of this feature lives on a
+    /// machine the user may not have set up yet, so the panel has to be able to
+    /// send them there rather than just saying no Macs were found.
+    private static let macAppURL = URL(string: "https://scan.libra.wiki")!
+
     var body: some View {
         NavigationStack {
             Form {
@@ -28,6 +33,7 @@ struct BridgeSheet: View {
                     connectingSection(macName: macName)
                 default:
                     nearbyMacsSection
+                    getMacAppSection
                 }
 
                 queueSection
@@ -69,7 +75,7 @@ struct BridgeSheet: View {
                     .foregroundStyle(.orange)
             }
             if incompatibility == .macIsOlder {
-                Link("Download the latest Mac app", destination: URL(string: "https://scan.libra.wiki")!)
+                Link("Download the latest Mac app", destination: Self.macAppURL)
             }
         } footer: {
             Text("Scans can't be typed until both sides are updated.")
@@ -144,6 +150,19 @@ struct BridgeSheet: View {
                     Text("If no Macs appear, check that LibraScan is allowed to use the Local Network in Settings.")
                 }
             }
+        }
+    }
+
+    /// Shown whenever no Mac is connected: an empty list reads as "something is
+    /// broken", when for a first-time user it usually just means the other half
+    /// isn't installed.
+    private var getMacAppSection: some View {
+        Section {
+            Link(destination: Self.macAppURL) {
+                Label("Get LibraScan for Mac", systemImage: "arrow.down.circle")
+            }
+        } footer: {
+            Text("Typing needs the free Mac app. Download it at scan.libra.wiki, then open it on your Mac — it lives in the menu bar.")
         }
     }
 
