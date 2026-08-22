@@ -32,7 +32,12 @@ fi
 
 VERSION="${1:-1.0}"
 mkdir -p download dl
-cp "../build/release-$VERSION/LibraScan-$VERSION.dmg" "download/LibraScan-$VERSION.dmg"
-cp "../build/release-$VERSION/LibraScan-$VERSION.dmg" "dl/LibraScan-$VERSION.dmg"   # /dl/ is the linked path; /download/ kept for old links
+SRC="../build/release-$VERSION/LibraScan-$VERSION.dmg"
+# /dl/LibraScan.dmg is the permanent address: it is what the site, the appcast,
+# and anything published elsewhere point at, and it never has to be revised for a
+# new version. The versioned copy stays so a specific build can still be linked.
+cp "$SRC" "dl/LibraScan.dmg"
+cp "$SRC" "dl/LibraScan-$VERSION.dmg"
+cp "$SRC" "download/LibraScan-$VERSION.dmg"   # kept for links published before /dl/
 npx --yes wrangler@latest pages project create librascan --production-branch main 2>/dev/null || true
 npx --yes wrangler@latest pages deploy . --project-name librascan --branch main --commit-dirty=true

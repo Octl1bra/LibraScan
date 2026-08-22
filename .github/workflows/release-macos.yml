@@ -204,7 +204,7 @@ jobs:
           # so the cache-busting tokens are bumped at deploy time (not committed).
           B="${{ steps.v.outputs.build }}"
           V="${{ steps.v.outputs.version }}"
-          sed -i '' -E "s/LibraScan-[0-9.]+\.dmg\?b=[0-9]+/LibraScan-${V}.dmg?b=${B}/g" \
+          sed -i '' -E "s/LibraScan\.dmg\?b=[0-9]+/LibraScan.dmg?b=${B}/g" \
             site/index.html site/assets/app.js
           sed -i '' -E "s/app\.js\?v=[0-9]+/app.js?v=${B}/g" site/index.html
           # The Mac app polls this to tell users a newer build exists.
@@ -212,7 +212,7 @@ jobs:
           {
             "version": "${V}",
             "build": ${B},
-            "url": "https://scan.libra.wiki/dl/LibraScan-${V}.dmg",
+            "url": "https://scan.libra.wiki/dl/LibraScan.dmg",
             "minimumSystemVersion": "15.0"
           }
           JSON
