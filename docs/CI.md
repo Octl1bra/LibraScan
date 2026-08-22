@@ -40,14 +40,16 @@ Xcode Cloud 做不了 macOS 那半边：它的后置脚本环境里 `security fi
 1Password 服务账号 `gh-action-librascan` 的令牌，只读 `gh-action` 保管库）。
 其余全部按名字从 1Password 取：
 
-| 保管库条目 | 字段 | 内容 |
-| --- | --- | --- |
-| `apple-dev-id-cert` | `p12_base64` | Developer ID Application 证书 + 私钥，`base64 -i cert.p12` |
-| | `password` | 导出 p12 时设的密码 |
-| | `identity` | 完整身份名，如 `Developer ID Application: Jinrui Hu (6NK6HJKB8Z)` |
-| `apple-asc-api-key` | `key_id` / `issuer_id` | ASC API 密钥的两个 ID |
-| | `p8` | `.p8` 文件的**全文**（含 BEGIN/END 行） |
-| `cloudflare-libra` | `credential` / `account_id` | 个人 Cloudflare token（Agents 保管库里那份复制过来） |
+| 保管库条目 | 字段 | 内容 | 状态 |
+| --- | --- | --- | --- |
+| `apple-dev-id-cert` | `p12_base64` | Developer ID Application 证书 + 私钥 | ✅ 2026-08-22 建好 |
+| | `password` | p12 密码 | ✅ |
+| | `identity` | `Developer ID Application: Jinrui Hu (6NK6HJKB8Z)` | ✅ |
+| | `private_key` / `csr` | 原始私钥与 CSR，续期时可复用 | ✅ |
+| `apple-asc-api-key` | `key_id` / `issuer_id` / `p8` | ASC 团队密钥（Admin），notarytool 用 | ✅ 2026-08-22 建好 |
+| `cloudflare-libra` | `credential` / `account_id` | 个人 Cloudflare token | ⬜ 需从 Agents 保管库复制过来 |
+
+证书有效期到 **2031-08-23**；ASC 的 `.p8` 只能下载一次，1Password 里是唯一副本。
 
 ### 关键：证书必须是 CSR 手动创建的，不能用云托管的
 
@@ -55,14 +57,28 @@ Xcode 自动建的 Developer ID Application 证书是**云托管**的——私�
 本机没有。`xcodebuild -exportArchive` 能签（它把待签数据发给 Apple 的签名服务），
 但 `codesign` 只认本地钥匙串里的完整身份，签 dmg 会报 `no identity found`。
 
-正确做法，一次性：
+正确做法（2026-08-22 已按此建好，续期时照做）：
 
-1. 钥匙串访问 → 证书助理 → **从证书颁发机构请求证书**：邮箱填你的，选「存储到磁盘」
-   ——私钥这一刻生成并留在本机。
-2. developer.apple.com → Certificates → **+** → **Developer ID Application** →
-   选**手动创建**（不要云托管）→ 上传刚才的 CSR → 下载 `.cer` → 双击安装。
-3. 钥匙串里找到它，右键导出为 `.p12`，设密码。
-4. `base64 -i cert.p12 | pbcopy`，连同密码和身份全名存进 `apple-dev-id-cert`。
+1. 生成私钥与 CSR。钥匙串访问 → 证书助理 → 从证书颁发机构请求证书，或等价的命令行：
+   ```bash
+   openssl genrsa -out private.key 2048
+   openssl req -new -key private.key -out req.certSigningRequest \
+     -subj "/emailAddress=me@libra.wiki/CN=Jinrui Hu/C=CN"
+   ```
+2. developer.apple.com → Certificates → **+** → Software → **Developer ID Application**
+   → Profile Type 选 **G2 Sub-CA** → 上传 CSR → Download `.cer`。
+   （**必须在网页上传 CSR**。在 Xcode 里让它自动管理，建出来的是云托管证书，签不了 dmg。）
+3. 合成 p12 并导入钥匙串：
+   ```bash
+   openssl x509 -inform DER -in developerID_application.cer -out cert.pem
+   openssl pkcs12 -export -inkey private.key -in cert.pem -out cert.p12 -passout pass:<密码>
+   security import cert.p12 -k ~/Library/Keychains/login.keychain-db -P <密码> \
+     -T /usr/bin/codesign -T /usr/bin/productsign
+   ```
+4. `base64 -i cert.p12`，连同密码、身份全名存进 `apple-dev-id-cert`，删掉磁盘上的明文。
+
+另外账号里还有一张 Xcode 自动创建的 **Developer ID Application Managed**（云托管、私钥在
+Apple、自动续期），`xcodebuild -exportArchive` 用它签 `.app`。两张并存互不影响，别吊销。
 
 Developer ID 证书每个账号有数量上限、有效期五年，**私钥丢了不能找回**——p12 存好。
 
