@@ -36,6 +36,8 @@ xcodebuild \
   build
 
 APP_PATH="$DERIVED_DATA/Build/Products/Debug-iphonesimulator/LibraScan.app"
+cp "$PROJECT_DIR/scripts/store-assets/demo-camera-background.png" \
+  "$APP_PATH/demo-camera-background.png"
 xcrun simctl install "$UDID" "$APP_PATH"
 
 capture() {

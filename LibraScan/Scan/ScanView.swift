@@ -242,22 +242,47 @@ struct ScanView: View {
 }
 
 #if DEBUG
-/// A deliberately simple simulator stand-in for the unavailable camera feed.
-/// The QR is generated locally at runtime; no screenshot-only asset ships.
+/// A screenshot-only simulator stand-in for the unavailable camera feed.
+/// The QR is generated locally at runtime. The capture script supplies the
+/// desk photo only to its Debug build; it is not a target resource.
 private struct DemoCameraPreview: View {
     private let image = Self.makeQRCode(from: LibraScanDemoMode.scanPayload.content)
+    private let backgroundImage: UIImage? = {
+        guard let url = Bundle.main.url(
+            forResource: "demo-camera-background",
+            withExtension: "png"
+        ) else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }()
 
     var body: some View {
-        Color(red: 0.055, green: 0.063, blue: 0.075)
-            .overlay {
+        GeometryReader { proxy in
+            ZStack {
+                if let backgroundImage {
+                    Image(uiImage: backgroundImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                } else {
+                    Color(red: 0.055, green: 0.063, blue: 0.075)
+                }
+
+                // A slight camera-style exposure reduction keeps the white
+                // viewfinder and guidance readable over the desk photo.
+                Color.black.opacity(0.13)
+
                 Image(uiImage: image)
                     .interpolation(.none)
                     .resizable()
                     .scaledToFit()
-                    .padding(12)
-                    .frame(width: 178, height: 178)
-                    .background(.white, in: RoundedRectangle(cornerRadius: 8))
+                    .frame(width: 174, height: 174)
+                    .rotationEffect(.degrees(13))
+                    .blendMode(.multiply)
+                    .position(x: proxy.size.width * 0.5, y: proxy.size.height * 0.505)
             }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+            .clipped()
+        }
     }
 
     private static func makeQRCode(from content: String) -> UIImage {
