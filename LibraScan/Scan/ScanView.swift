@@ -4,9 +4,6 @@
 //
 
 import AVFoundation
-#if DEBUG
-import CoreImage.CIFilterBuiltins
-#endif
 import SwiftData
 import SwiftUI
 
@@ -243,10 +240,9 @@ struct ScanView: View {
 
 #if DEBUG
 /// A screenshot-only simulator stand-in for the unavailable camera feed.
-/// The QR is generated locally at runtime. The capture script supplies the
-/// desk photo only to its Debug build; it is not a target resource.
+/// The capture script supplies a complete desk-and-QR image only to its Debug
+/// build; it is not a target resource.
 private struct DemoCameraPreview: View {
-    private let image = Self.makeQRCode(from: LibraScanDemoMode.scanPayload.content)
     private let backgroundImage: UIImage? = {
         guard let url = Bundle.main.url(
             forResource: "demo-camera-background",
@@ -270,31 +266,12 @@ private struct DemoCameraPreview: View {
                 // A slight camera-style exposure reduction keeps the white
                 // viewfinder and guidance readable over the desk photo.
                 Color.black.opacity(0.13)
-
-                Image(uiImage: image)
-                    .interpolation(.none)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 174, height: 174)
-                    .rotationEffect(.degrees(13))
-                    .blendMode(.multiply)
-                    .position(x: proxy.size.width * 0.5, y: proxy.size.height * 0.505)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
             .clipped()
         }
     }
 
-    private static func makeQRCode(from content: String) -> UIImage {
-        let filter = CIFilter.qrCodeGenerator()
-        filter.message = Data(content.utf8)
-        filter.correctionLevel = "M"
-        guard let output = filter.outputImage else { return UIImage() }
-        let scaled = output.transformed(by: CGAffineTransform(scaleX: 12, y: 12))
-        let context = CIContext(options: [.useSoftwareRenderer: true])
-        guard let cgImage = context.createCGImage(scaled, from: scaled.extent) else { return UIImage() }
-        return UIImage(cgImage: cgImage)
-    }
 }
 #endif
 
