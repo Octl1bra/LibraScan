@@ -3,7 +3,6 @@
   const CONFIG = {
     // Fill in once the app is live on the App Store, e.g. "https://apps.apple.com/app/id0000000000".
     appStoreURL: "",
-    macVersion: "1.0",
     // GitHub resolves this to whichever release is newest, so shipping a version
     // never touches the site. Nothing here needs revising for 1.1.
     macDownloadURL: "https://github.com/Octl1bra/LibraScan/releases/latest/download/LibraScan.dmg",
@@ -37,7 +36,6 @@
       a.href = "mailto:" + CONFIG.supportEmail;
       if (!a.textContent.trim()) a.textContent = CONFIG.supportEmail;
     });
-    document.querySelectorAll("[data-mac-version]").forEach((el) => (el.textContent = CONFIG.macVersion));
     document.querySelectorAll("[data-mac-sha]").forEach((el) => (el.textContent = CONFIG.macSHA256));
     document.querySelectorAll("[data-mac-download]").forEach((a) => (a.href = CONFIG.macDownloadURL));
     // Apple's badge may only appear linked to the product page, so it stays
