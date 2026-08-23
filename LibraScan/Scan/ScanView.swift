@@ -17,6 +17,7 @@ struct ScanView: View {
     @GestureState private var pinchAnchor: CGFloat?
     @State private var bannerDismissTask: Task<Void, Never>?
     @State private var isBridgeSheetPresented = false
+    @State private var screenWake = ScreenWakeKeeper()
 
     private let bannerDuration: Duration = .seconds(4)
 
@@ -49,6 +50,7 @@ struct ScanView: View {
                 scanner.start()
             } else {
                 scanner.stop()
+                screenWake.stop()
             }
         }
         .onChange(of: scenePhase) { _, phase in
@@ -63,6 +65,7 @@ struct ScanView: View {
                 bridge.sceneDidBecomeActive()
             case .background:
                 scanner.stop()
+                screenWake.stop()
                 bridge.sceneDidEnterBackground()
             default:
                 break
@@ -77,6 +80,7 @@ struct ScanView: View {
             }
 #endif
             HapticFeedback.success()
+            screenWake.extend()
             let record = ScanRecord(content: payload.content, symbology: payload.symbology)
             modelContext.insert(record)
             // History is the source of truth; the Mac bridge is a side channel.
@@ -86,6 +90,7 @@ struct ScanView: View {
         .sheet(isPresented: $isBridgeSheetPresented) {
             BridgeSheet(bridge: bridge)
         }
+        .onDisappear { screenWake.stop() }
     }
 
     @ViewBuilder
